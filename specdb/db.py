@@ -1283,6 +1283,21 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="expm1.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(deps[0].dtype)),
+                ],
+            )
+        ],
+    ),
+    Spec(
         op="fill.Scalar",  # (Tensor self, Scalar value) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
