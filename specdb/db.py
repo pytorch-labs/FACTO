@@ -1264,6 +1264,23 @@ SpecDB = [
         outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
+        op="eq.Tensor",  # (Tensor self, Tensor other) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Tensor,
+                name="other",
+                deps=[0],
+                constraints=[
+                    cp.Size.In(
+                        lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
         op="erf.default",  # (Tensor self) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
