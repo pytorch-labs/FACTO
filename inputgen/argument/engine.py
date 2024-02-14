@@ -188,11 +188,13 @@ class MetaArg:
 class MetaArgEngine:
     def __init__(
         self,
+        out: bool,
         argtype: ArgType,
         constraints: List[Constraint],
         deps: List[Any],
         valid: bool,
     ):
+        self.out = out
         self.argtype = argtype
         self.constraints = constraints
         self.deps = deps
@@ -243,6 +245,21 @@ class MetaArgEngine:
 
     def gen(self, focus):
         # TODO(mcandales): Enable Tensor List generation
+
+        if self.out:
+            if self.argtype.is_tensor():
+                if focus in [None, Attribute.DTYPE]:
+                    struct = (0,)
+                    for dtype in self.gen_dtypes(focus):
+                        for space in self.gen_value_spaces(focus, dtype, struct):
+                            yield MetaArg(
+                                self.argtype, dtype=dtype, structure=struct, value=space
+                            )
+                return
+            elif self.argtype.is_tensor_list():
+                raise NotImplementedError("Tensor List output not implemented yet")
+            else:
+                raise ValueError("Output argtype must be tensor or tensor list")
 
         if focus in [None, Attribute.OPTIONAL]:
             if self.argtype.is_optional() and self.gen_optional():

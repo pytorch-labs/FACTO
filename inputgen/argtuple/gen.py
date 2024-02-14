@@ -19,21 +19,22 @@ class ArgumentTupleGenerator:
     def gen_tuple(
         self, meta_tuple: Tuple[MetaArg], *, out: bool = False
     ) -> Tuple[List[Any], OrderedDict[str, Any]]:
-        args = []
-        kwargs = OrderedDict()
+        posargs = []
+        inkwargs = OrderedDict()
+        outargs = OrderedDict()
         for ix, arg in enumerate(self.spec.inspec):
             m = meta_tuple[ix]
             val = ArgumentGenerator(m).gen()
             if arg.kw:
-                kwargs[arg.name] = val
+                inkwargs[arg.name] = val
             else:
-                args.append(val)
+                posargs.append(val)
         if out:
             for ix, arg in enumerate(self.spec.outspec):
                 m = meta_tuple[ix + len(self.spec.inspec)]
                 val = ArgumentGenerator(m).gen()
-                kwargs[arg.name] = val
-        return args, kwargs
+                outargs[arg.name] = val
+        return posargs, inkwargs, outargs
 
     def gen(
         self, *, valid: bool = True, out: bool = False

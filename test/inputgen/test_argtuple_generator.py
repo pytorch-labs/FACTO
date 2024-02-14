@@ -39,11 +39,12 @@ class TestArgumentTupleGenerator(unittest.TestCase):
             outspec=[],
         )
 
-        for args, kwargs in ArgumentTupleGenerator(spec).gen():
-            self.assertEqual(len(args), 2)
-            self.assertEqual(kwargs, {})
-            t = args[0]
-            dim = args[1]
+        for posargs, inkwargs, outargs in ArgumentTupleGenerator(spec).gen():
+            self.assertEqual(len(posargs), 2)
+            self.assertEqual(inkwargs, {})
+            self.assertEqual(outargs, {})
+            t = posargs[0]
+            dim = posargs[1]
             self.assertTrue(isinstance(t, torch.Tensor))
             self.assertTrue(isinstance(dim, int))
             if t.dim() == 0:

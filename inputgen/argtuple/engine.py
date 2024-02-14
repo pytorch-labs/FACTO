@@ -39,8 +39,11 @@ def inverse_permutation(permutation):
 class MetaArgTupleEngine:
     def __init__(self, spec: Spec, out: bool = False):
         if out:
-            raise NotImplementedError("out=True is not supported yet")
-        self.args = spec.inspec
+            for arg in spec.outspec:
+                arg.deps = list(range(len(spec.inspec)))
+            self.args = spec.inspec + spec.outspec
+        else:
+            self.args = spec.inspec
         self.order = self._sort_dependencies()
         self.order_inverse_perm = inverse_permutation(self.order)
 
@@ -77,7 +80,9 @@ class MetaArgTupleEngine:
             for focus in focuses:
                 for meta_tuple in tuples:
                     deps = self._get_deps(meta_tuple, arg.deps)
-                    engine = MetaArgEngine(arg.type, arg.constraints, deps, valid)
+                    engine = MetaArgEngine(
+                        arg.out, arg.type, arg.constraints, deps, valid
+                    )
                     for meta_arg in engine.gen(focus):
                         new_tuples.append(meta_tuple + (meta_arg,))
             tuples = new_tuples
@@ -98,7 +103,7 @@ class MetaArgTupleEngine:
             # Generating invalid argument {ix} {arg.type}
             deps = tuple(valid_value_tuple[i] for i in arg.deps)
             for focus in Attribute.hierarchy(arg.type):
-                engine = MetaArgEngine(arg.type, arg.constraints, deps, False)
+                engine = MetaArgEngine(arg.out, arg.type, arg.constraints, deps, False)
                 for meta_arg in engine.gen(focus):
                     invalid_tuple = (
                         valid_tuple[:ix] + (meta_arg,) + valid_tuple[ix + 1 :]
