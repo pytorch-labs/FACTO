@@ -3071,6 +3071,26 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="trunc.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
         op="unbind_copy.int",  # (Tensor self, int dim=0) -> Tensor[]
         inspec=[
             InPosArg(
