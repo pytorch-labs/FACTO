@@ -1715,7 +1715,60 @@ SpecDB = [
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
         ],
-        outspec=[OutArg(ArgType.Tensor)],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(deps[0].dtype)),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="log10.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(deps[0].dtype)),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="log1p.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(deps[0].dtype)),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="log2.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(deps[0].dtype)),
+                ],
+            )
+        ],
     ),
     Spec(
         op="logical_and.default",  # (Tensor self, Tensor other) -> Tensor
