@@ -2411,6 +2411,64 @@ SpecDB = [
         outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
+        op="prod.default",  # (Tensor self, *, ScalarType? dtype=None) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InKwArg(ArgType.ScalarTypeOpt, name="dtype"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                deps=[0, 1],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[1] if deps[1] is not None else None),
+                    cp.Dtype.Eq(
+                        lambda deps: torch.long
+                        if deps[1] is None and deps[0].dtype in dt._int_and_bool
+                        else None
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: deps[0].dtype
+                        if deps[1] is None and deps[0].dtype not in dt._int_and_bool
+                        else None
+                    ),
+                ],
+            ),
+        ],
+    ),
+    Spec(
+        op="prod.dim_int",  # (Tensor self, int dim, bool keepdim=False, *, ScalarType? dtype=None) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Dim,
+                name="dim",
+                deps=[0],
+                constraints=DimDefault,
+            ),
+            InPosArg(ArgType.Bool, name="keepdim"),
+            InKwArg(ArgType.ScalarTypeOpt, name="dtype"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[3] if deps[3] is not None else None),
+                    cp.Dtype.Eq(
+                        lambda deps: torch.long
+                        if deps[3] is None and deps[0].dtype in dt._int_and_bool
+                        else None
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: deps[0].dtype
+                        if deps[3] is None and deps[0].dtype not in dt._int_and_bool
+                        else None
+                    ),
+                ],
+            ),
+        ],
+    ),
+    Spec(
         op="reciprocal.default",  # (Tensor self) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
