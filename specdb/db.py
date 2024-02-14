@@ -583,6 +583,35 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="atan2.default",  # (Tensor self, Tensor other) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Tensor,
+                name="other",
+                deps=[0],
+                constraints=[
+                    cp.Size.In(
+                        lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
+                    ),
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt.can_cast_from(torch.float)),
+                    cp.Dtype.In(
+                        lambda deps: dt.can_cast_from(
+                            torch.promote_types(deps[0].dtype, deps[1].dtype)
+                        )
+                    ),
+                ],
+            )
+        ],
+    ),
+    Spec(
         op="atanh.default",  # (Tensor self) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
