@@ -2476,6 +2476,114 @@ SpecDB = [
         outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
+        op="reflection_pad1d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [2, 3]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Lt(
+                        lambda deps, length, ix: deps[0].size(-ix - 1)
+                        if ix < 1
+                        else None
+                    ),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="reflection_pad2d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [3, 4]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 4),
+                    cp.Value.Lt(
+                        lambda deps, length, ix: deps[0].size(-ix - 1)
+                        if ix < 2
+                        else None
+                    ),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                    # self.size(-2) + padding[2] + padding[3] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="reflection_pad3d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [4, 5]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 6),
+                    cp.Value.Lt(
+                        lambda deps, length, ix: deps[0].size(-ix - 1)
+                        if ix < 3
+                        else None
+                    ),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                    # self.size(-2) + padding[2] + padding[3] >= 0
+                    # self.size(-3) + padding[4] + padding[5] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
         op="relu.default",  # (Tensor self) -> Tensor
         inspec=[
             InPosArg(
@@ -2563,6 +2671,99 @@ SpecDB = [
         ],
         outspec=[
             OutArg(ArgType.Tensor),
+        ],
+    ),
+    Spec(
+        op="replication_pad1d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [2, 3]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 2),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="replication_pad2d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [3, 4]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 4),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                    # self.size(-2) + padding[2] + padding[3] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
+        ],
+    ),
+    Spec(
+        op="replication_pad3d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.In(lambda deps: [4, 5]),
+                ],
+            ),
+            InPosArg(
+                ArgType.LengthList,
+                name="padding",
+                deps=[0],
+                constraints=[
+                    cp.Length.Eq(lambda deps: 6),
+                    # TODO(mcandales): Calibrate.
+                    # self.size(-1) + padding[0] + padding[1] >= 0
+                    # self.size(-2) + padding[2] + padding[3] >= 0
+                    # self.size(-3) + padding[4] + padding[5] >= 0
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            )
         ],
     ),
     Spec(
