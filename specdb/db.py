@@ -2040,6 +2040,34 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="maximum.default",  # (Tensor self, Tensor other) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Tensor,
+                name="other",
+                deps=[0],
+                constraints=[
+                    cp.Size.In(
+                        lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
+                    ),
+                ],
+            ),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(
+                        lambda deps: dt.can_cast_from(
+                            torch.promote_types(deps[0].dtype, deps[1].dtype)
+                        )
+                    ),
+                ],
+            )
+        ],
+    ),
+    Spec(
         op="mean.dim",  # (Tensor self, int[1]? dim, bool keepdim=False, *, ScalarType? dtype=None) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
@@ -2102,7 +2130,18 @@ SpecDB = [
                 ],
             ),
         ],
-        outspec=[OutArg(ArgType.Tensor)],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.In(
+                        lambda deps: dt.can_cast_from(
+                            torch.promote_types(deps[0].dtype, deps[1].dtype)
+                        )
+                    ),
+                ],
+            )
+        ],
     ),
     Spec(
         op="mm.default",  # (Tensor self, Tensor mat2) -> Tensor
