@@ -14,4 +14,12 @@ _real_and_bool = [torch.bool] + _int + _floating
 _floating_and_half = [torch.half] + _floating
 _complex = [torch.chalf, torch.cfloat, torch.cdouble]
 _quant = [torch.qint8, torch.quint8, torch.qint32, torch.quint4x2, torch.quint2x4]
-_all = [torch.bool] + _int + _floating + _complex + _quant
+_all = [torch.bool] + _int + _floating_and_half + _complex + _quant
+
+
+def can_cast_from(t):
+    return [x for x in _all if torch.can_cast(t, x)]
+
+
+def can_cast_to(t):
+    return [x for x in _all if torch.can_cast(x, t)]
