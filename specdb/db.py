@@ -239,9 +239,12 @@ SpecDB = [
                 deps=[0, 1],
                 constraints=[
                     cp.Dtype.Ne(
-                        lambda deps: ScalarDtype.bool
-                        if deps[0].dtype != torch.bool or deps[1] != ScalarDtype.bool
-                        else None
+                        lambda deps: (
+                            ScalarDtype.bool
+                            if deps[0].dtype != torch.bool
+                            or deps[1] != ScalarDtype.bool
+                            else None
+                        )
                     ),
                     cp.Dtype.In(
                         lambda deps: fn.st_le(
@@ -515,9 +518,11 @@ SpecDB = [
                 deps=[1, 2, 3],
                 constraints=[
                     cp.Rank.Ge(
-                        lambda deps: 1
-                        if fn.as_strided_min_numel(deps[0], deps[1], deps[2]) > 1
-                        else 0
+                        lambda deps: (
+                            1
+                            if fn.as_strided_min_numel(deps[0], deps[1], deps[2]) > 1
+                            else 0
+                        )
                     ),
                     cp.Size.Gen(
                         lambda deps, rank: (
@@ -1123,9 +1128,11 @@ SpecDB = [
                 deps=[0],
                 constraints=[
                     cp.Value.Ne(
-                        lambda deps: torch.bool
-                        if deps[0].dim() > 0 and deps[0].numel() > 0
-                        else None
+                        lambda deps: (
+                            torch.bool
+                            if deps[0].dim() > 0 and deps[0].numel() > 0
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -1174,12 +1181,14 @@ SpecDB = [
                         lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype, struct: 0
-                        if (deps[0].numel() > 0 and math.prod(struct) > 0)
-                        and deps[1] is not None
-                        and torch.promote_types(deps[0].dtype, dtype)
-                        not in dt._floating
-                        else None
+                        lambda deps, dtype, struct: (
+                            0
+                            if (deps[0].numel() > 0 and math.prod(struct) > 0)
+                            and deps[1] is not None
+                            and torch.promote_types(deps[0].dtype, dtype)
+                            not in dt._floating
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -1222,9 +1231,11 @@ SpecDB = [
                         lambda deps, dtype, struct: 0 if math.prod(struct) > 0 else None
                     ),
                     cp.Value.Le(
-                        lambda deps, dtype, struct: max(fn.safe_size(deps[0], 0) - 1, 0)
-                        if math.prod(struct) > 0
-                        else None
+                        lambda deps, dtype, struct: (
+                            max(fn.safe_size(deps[0], 0) - 1, 0)
+                            if math.prod(struct) > 0
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -1306,9 +1317,9 @@ SpecDB = [
                     cp.Length.Ge(lambda deps: deps[0].dim()),
                     cp.Value.Ge(lambda deps, length, ix: -1),
                     cp.Value.Ge(
-                        lambda deps, length, ix: 0
-                        if ix < length - deps[0].dim()
-                        else None
+                        lambda deps, length, ix: (
+                            0 if ix < length - deps[0].dim() else None
+                        )
                     ),
                     cp.Value.In(
                         lambda deps, length, ix: fn.expand_copy_size_in(
@@ -1410,11 +1421,13 @@ SpecDB = [
                         lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype, struct: 0
-                        if (deps[0].numel() > 0 and math.prod(struct) > 0)
-                        and torch.promote_types(deps[0].dtype, dtype)
-                        not in dt._floating
-                        else None
+                        lambda deps, dtype, struct: (
+                            0
+                            if (deps[0].numel() > 0 and math.prod(struct) > 0)
+                            and torch.promote_types(deps[0].dtype, dtype)
+                            not in dt._floating
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -1439,11 +1452,13 @@ SpecDB = [
                         lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype, struct: 0
-                        if (deps[0].numel() > 0 and math.prod(struct) > 0)
-                        and torch.promote_types(deps[0].dtype, dtype)
-                        not in dt._floating
-                        else None
+                        lambda deps, dtype, struct: (
+                            0
+                            if (deps[0].numel() > 0 and math.prod(struct) > 0)
+                            and torch.promote_types(deps[0].dtype, dtype)
+                            not in dt._floating
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -1462,18 +1477,20 @@ SpecDB = [
                 deps=[0],
                 constraints=[
                     cp.Dtype.Ne(
-                        lambda deps: ScalarDtype.bool
-                        if deps[0].dtype == torch.bool
-                        else None
+                        lambda deps: (
+                            ScalarDtype.bool if deps[0].dtype == torch.bool else None
+                        )
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype: 0
-                        if (
-                            deps[0].numel() > 0
-                            and fn.promote_type_with_scalar(deps[0].dtype, dtype)
-                            not in dt._floating
+                        lambda deps, dtype: (
+                            0
+                            if (
+                                deps[0].numel() > 0
+                                and fn.promote_type_with_scalar(deps[0].dtype, dtype)
+                                not in dt._floating
+                            )
+                            else None
                         )
-                        else None
                     ),
                 ],
             ),
@@ -1700,9 +1717,11 @@ SpecDB = [
                     cp.Size.Eq(lambda deps, r, d: 1 if deps[0].dim() == 0 else None),
                     cp.Value.Ge(lambda deps, dtype, struct: 0),
                     cp.Value.Le(
-                        lambda deps, dtype, struct: 0
-                        if deps[0].dim() == 0
-                        else fn.safe_size(deps[0], deps[1]) - 1
+                        lambda deps, dtype, struct: (
+                            0
+                            if deps[0].dim() == 0
+                            else fn.safe_size(deps[0], deps[1]) - 1
+                        )
                     ),
                 ],
             ),
@@ -2084,9 +2103,9 @@ SpecDB = [
                 deps=[0],
                 constraints=[
                     cp.Optional.Eq(
-                        lambda deps: False
-                        if deps[0].dtype not in dt._floating
-                        else None
+                        lambda deps: (
+                            False if deps[0].dtype not in dt._floating else None
+                        )
                     ),
                     cp.Value.In(lambda deps: dt._floating),
                 ],
@@ -2329,21 +2348,23 @@ SpecDB = [
                 constraints=[
                     cp.Rank.Ge(lambda deps: 3),
                     cp.Size.Be(
-                        lambda deps, r, d: [
-                            0,
-                            1,
-                            2,
-                            3,
-                            4,
-                            8,
-                            9,
-                            12,
-                            16,
-                            18,
-                            25,
-                        ]
-                        if d == r - 3
-                        else None
+                        lambda deps, r, d: (
+                            [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                8,
+                                9,
+                                12,
+                                16,
+                                18,
+                                25,
+                            ]
+                            if d == r - 3
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -2376,9 +2397,9 @@ SpecDB = [
                 deps=[0],
                 constraints=[
                     cp.Dtype.Ne(
-                        lambda deps: ScalarDtype.bool
-                        if deps[0].dtype == torch.bool
-                        else None
+                        lambda deps: (
+                            ScalarDtype.bool if deps[0].dtype == torch.bool else None
+                        )
                     ),
                     cp.Value.Ge(
                         lambda deps, dtype: 0 if dtype == ScalarDtype.int else None
@@ -2423,14 +2444,18 @@ SpecDB = [
                 constraints=[
                     cp.Dtype.Eq(lambda deps: deps[1] if deps[1] is not None else None),
                     cp.Dtype.Eq(
-                        lambda deps: torch.long
-                        if deps[1] is None and deps[0].dtype in dt._int_and_bool
-                        else None
+                        lambda deps: (
+                            torch.long
+                            if deps[1] is None and deps[0].dtype in dt._int_and_bool
+                            else None
+                        )
                     ),
                     cp.Dtype.Eq(
-                        lambda deps: deps[0].dtype
-                        if deps[1] is None and deps[0].dtype not in dt._int_and_bool
-                        else None
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is None and deps[0].dtype not in dt._int_and_bool
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -2455,14 +2480,18 @@ SpecDB = [
                 constraints=[
                     cp.Dtype.Eq(lambda deps: deps[3] if deps[3] is not None else None),
                     cp.Dtype.Eq(
-                        lambda deps: torch.long
-                        if deps[3] is None and deps[0].dtype in dt._int_and_bool
-                        else None
+                        lambda deps: (
+                            torch.long
+                            if deps[3] is None and deps[0].dtype in dt._int_and_bool
+                            else None
+                        )
                     ),
                     cp.Dtype.Eq(
-                        lambda deps: deps[0].dtype
-                        if deps[3] is None and deps[0].dtype not in dt._int_and_bool
-                        else None
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[3] is None and deps[0].dtype not in dt._int_and_bool
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -2492,9 +2521,9 @@ SpecDB = [
                 constraints=[
                     cp.Length.Eq(lambda deps: 2),
                     cp.Value.Lt(
-                        lambda deps, length, ix: deps[0].size(-ix - 1)
-                        if ix < 1
-                        else None
+                        lambda deps, length, ix: (
+                            deps[0].size(-ix - 1) if ix < 1 else None
+                        )
                     ),
                     # TODO(mcandales): Calibrate.
                     # self.size(-1) + padding[0] + padding[1] >= 0
@@ -2527,9 +2556,9 @@ SpecDB = [
                 constraints=[
                     cp.Length.Eq(lambda deps: 4),
                     cp.Value.Lt(
-                        lambda deps, length, ix: deps[0].size(-ix - 1)
-                        if ix < 2
-                        else None
+                        lambda deps, length, ix: (
+                            deps[0].size(-ix - 1) if ix < 2 else None
+                        )
                     ),
                     # TODO(mcandales): Calibrate.
                     # self.size(-1) + padding[0] + padding[1] >= 0
@@ -2563,9 +2592,9 @@ SpecDB = [
                 constraints=[
                     cp.Length.Eq(lambda deps: 6),
                     cp.Value.Lt(
-                        lambda deps, length, ix: deps[0].size(-ix - 1)
-                        if ix < 3
-                        else None
+                        lambda deps, length, ix: (
+                            deps[0].size(-ix - 1) if ix < 3 else None
+                        )
                     ),
                     # TODO(mcandales): Calibrate.
                     # self.size(-1) + padding[0] + padding[1] >= 0
@@ -2612,11 +2641,13 @@ SpecDB = [
                         lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype, struct: 0
-                        if (deps[0].numel() > 0 and math.prod(struct) > 0)
-                        and torch.promote_types(deps[0].dtype, dtype)
-                        not in dt._floating
-                        else None
+                        lambda deps, dtype, struct: (
+                            0
+                            if (deps[0].numel() > 0 and math.prod(struct) > 0)
+                            and torch.promote_types(deps[0].dtype, dtype)
+                            not in dt._floating
+                            else None
+                        )
                     ),
                 ],
             ),
@@ -2635,18 +2666,20 @@ SpecDB = [
                 deps=[0],
                 constraints=[
                     cp.Dtype.Ne(
-                        lambda deps: ScalarDtype.bool
-                        if deps[0].dtype == torch.bool
-                        else None
+                        lambda deps: (
+                            ScalarDtype.bool if deps[0].dtype == torch.bool else None
+                        )
                     ),
                     cp.Value.Ne(
-                        lambda deps, dtype: 0
-                        if (
-                            deps[0].numel() > 0
-                            and fn.promote_type_with_scalar(deps[0].dtype, dtype)
-                            not in dt._floating
+                        lambda deps, dtype: (
+                            0
+                            if (
+                                deps[0].numel() > 0
+                                and fn.promote_type_with_scalar(deps[0].dtype, dtype)
+                                not in dt._floating
+                            )
+                            else None
                         )
-                        else None
                     ),
                 ],
             ),
@@ -2863,15 +2896,19 @@ SpecDB = [
                     #     deps[0], deps[1], deps[2], d
                     # )),
                     cp.Size.Le(
-                        lambda deps, r, d: fn.safe_size(deps[0], d)
-                        if d != fn.normalize(deps[1], deps[0].dim())
-                        else None
+                        lambda deps, r, d: (
+                            fn.safe_size(deps[0], d)
+                            if d != fn.normalize(deps[1], deps[0].dim())
+                            else None
+                        )
                     ),
                     cp.Value.Ge(lambda deps, dtype, struct: 0),
                     cp.Value.Le(
-                        lambda deps, dtype, struct: 0
-                        if deps[0].dim() == 0
-                        else max(0, fn.safe_size(deps[0], deps[1]) - 1)
+                        lambda deps, dtype, struct: (
+                            0
+                            if deps[0].dim() == 0
+                            else max(0, fn.safe_size(deps[0], deps[1]) - 1)
+                        )
                     ),
                 ],
             ),
@@ -2885,9 +2922,9 @@ SpecDB = [
                         lambda deps: deps[1].dim() if deps[1].numel() != 0 else None
                     ),
                     cp.Size.Ge(
-                        lambda deps, r, d: fn.safe_size(deps[1], d)
-                        if deps[1].numel() != 0
-                        else None
+                        lambda deps, r, d: (
+                            fn.safe_size(deps[1], d) if deps[1].numel() != 0 else None
+                        )
                     ),
                 ],
             ),

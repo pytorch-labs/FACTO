@@ -27,9 +27,9 @@ class TestMetaArgTupleEngine(unittest.TestCase):
                         ),
                         cp.Value.Ge(lambda deps: -1 if deps[0].dim() == 0 else None),
                         cp.Value.Le(
-                            lambda deps: deps[0].dim() - 1
-                            if deps[0].dim() > 0
-                            else None
+                            lambda deps: (
+                                deps[0].dim() - 1 if deps[0].dim() > 0 else None
+                            )
                         ),
                         cp.Value.Le(lambda deps: 0 if deps[0].dim() == 0 else None),
                     ],
