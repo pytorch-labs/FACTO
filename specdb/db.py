@@ -997,9 +997,10 @@ SpecDB = [
                 name="bias",
                 deps=[1, 6, 8],
                 constraints=[
-                    cp.Dtype.In(
-                        lambda deps: [deps[0].dtype] if deps[1] else dt._floating
-                    ),  # TODO(mcandales): Calibrate.
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                    # cp.Dtype.In(
+                    #    lambda deps: [deps[0].dtype] if deps[1] else dt._floating
+                    # ),  # TODO(mcandales): Calibrate.
                     cp.Rank.Eq(lambda deps: 1),
                     cp.Size.Eq(
                         lambda deps, r, d: fn.conv_bias_size_eq(
@@ -1039,7 +1040,7 @@ SpecDB = [
                 ArgType.Bool,
                 name="transposed",
                 # TODO(mcandales): Executorch specific constraint
-                # constraints=[cp.Value.In(lambda deps: [False]]),
+                # constraints=[cp.Value.Eq(lambda deps: False)],
             ),
             InPosArg(  # output_padding
                 ArgType.LengthList,

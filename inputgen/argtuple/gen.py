@@ -18,7 +18,7 @@ class ArgumentTupleGenerator:
 
     def gen_tuple(
         self, meta_tuple: Tuple[MetaArg], *, out: bool = False
-    ) -> Tuple[List[Any], OrderedDict[str, Any]]:
+    ) -> Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]]:
         posargs = []
         inkwargs = OrderedDict()
         outargs = OrderedDict()
