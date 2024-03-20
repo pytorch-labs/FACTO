@@ -45,6 +45,27 @@ def promote_type_with_scalar(t, scalar):
             return torch.float32
 
 
+def promote_type_with_scalar_dtype(t, scalar_dtype):
+    if scalar_dtype == ScalarDtype.bool:
+        return t
+    elif scalar_dtype == ScalarDtype.int:
+        if t != torch.bool:
+            return t
+        else:
+            return torch.int64
+    if scalar_dtype == ScalarDtype.float:
+        if t in [torch.float32, torch.float64]:
+            return t
+        else:
+            return torch.float32
+
+
+def promote_type_with_opt_scalar(t, scalar):
+    if scalar is None:
+        return t
+    return promote_type_with_scalar(t, scalar)
+
+
 def dt_to_st(dt):
     if dt is None:
         return None
