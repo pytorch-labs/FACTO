@@ -28,7 +28,7 @@ class StructuralEngine:
         self.constraints = constraints
         self.deps = deps
         self.valid = valid
-        self.hierarchy = StructuralEngine.hierarchy(argtype)
+        self._hierarchy = StructuralEngine.hierarchy(argtype)
 
         self.gen_list_mode = set()
         for constraint in constraints:
@@ -54,7 +54,7 @@ class StructuralEngine:
             yield ()
             return
 
-        attr = self.hierarchy[-(depth + 1)]
+        attr = self._hierarchy[-(depth + 1)]
 
         if attr in self.gen_list_mode:
             yield from self.gen_structure_with_depth(depth, focus, length)
@@ -81,7 +81,7 @@ class StructuralEngine:
         length: Optional[int] = None,
         ix: Optional[int] = None,
     ):
-        attr = self.hierarchy[-(depth + 1)]
+        attr = self._hierarchy[-(depth + 1)]
 
         if ix is not None:
             args = (self.deps, length, ix)
@@ -104,7 +104,7 @@ class StructuralEngine:
                 yield from self.gen_structure_with_depth_and_length(depth - 1, v, focus)
 
     def gen(self, focus: Attribute):
-        depth = len(self.hierarchy) - 1
+        depth = len(self._hierarchy) - 1
         yield from self.gen_structure_with_depth(depth, focus)
 
 

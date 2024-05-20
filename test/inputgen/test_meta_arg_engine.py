@@ -22,8 +22,9 @@ class TestMetaArgEngine(unittest.TestCase):
             cp.Value.Ne(lambda deps, dtype, struct: 0),
         ]
         deps = [2]
+        outarg = False
 
-        engine = MetaArgEngine(ArgType.Tensor, constraints, deps, True)
+        engine = MetaArgEngine(outarg, ArgType.Tensor, constraints, deps, True)
         ms = list(engine.gen(Attribute.DTYPE))
         self.assertEqual(len(ms), len(SUPPORTED_TENSOR_DTYPES))
         self.assertEqual({m.dtype for m in ms}, set(SUPPORTED_TENSOR_DTYPES))
@@ -50,14 +51,15 @@ class TestMetaArgEngine(unittest.TestCase):
             ),
         ]
         deps = [2, 3]
+        outarg = False
 
-        engine = MetaArgEngine(ArgType.DimList, constraints, deps, True)
+        engine = MetaArgEngine(outarg, ArgType.DimList, constraints, deps, True)
         ms = list(engine.gen(Attribute.VALUE))
         self.assertEqual(len(ms), 1)
         self.assertTrue(1 <= len(ms[0].value) <= 5)
         self.assertTrue(all(v == 2 for v in ms[0].value))
 
-        engine = MetaArgEngine(ArgType.DimList, constraints, deps, False)
+        engine = MetaArgEngine(outarg, ArgType.DimList, constraints, deps, False)
         ms = list(engine.gen(Attribute.VALUE))
         self.assertEqual(len(ms), 1)
         self.assertTrue(1 <= len(ms[0].value) <= 5)
