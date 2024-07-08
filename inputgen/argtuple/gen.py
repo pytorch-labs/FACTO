@@ -4,7 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Any, List, OrderedDict, Tuple
+from collections import OrderedDict
+from typing import Any, Generator, List, Tuple
 
 from inputgen.argtuple.engine import MetaArgTupleEngine
 from inputgen.argument.engine import MetaArg
@@ -38,7 +39,9 @@ class ArgumentTupleGenerator:
 
     def gen(
         self, *, valid: bool = True, out: bool = False
-    ) -> Tuple[List[Any], OrderedDict[str, Any]]:
+    ) -> Generator[
+        Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
+    ]:
         engine = MetaArgTupleEngine(self.spec, out=out)
         for meta_tuple in engine.gen(valid=valid):
             yield self.gen_tuple(meta_tuple, out=out)
