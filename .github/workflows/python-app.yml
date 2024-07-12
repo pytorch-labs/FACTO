@@ -30,4 +30,4 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m unittest discover -s test -p "*.py"
+        python -m unittest discover -s test/inputgen -p "*.py"

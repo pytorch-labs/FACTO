@@ -6,7 +6,7 @@
 
 import math
 from enum import Enum
-from typing import Any
+from typing import Any, List, Set
 
 import torch
 
@@ -93,3 +93,13 @@ def convert_to_vtype(vtype: type, v: Any) -> Any:
     if vtype == float:
         return float(v)
     return v
+
+
+def sort_values_of_type(vtype: type, values: Set[Any]) -> List[Any]:
+    if vtype in [bool, int, float, str, tuple]:
+        return sorted(values)
+    if vtype == torch.dtype:
+        return [v for v in SUPPORTED_TENSOR_DTYPES if v in values]
+    if vtype == ScalarDtype:
+        return [v for v in ScalarDtype if v in values]
+    return list(values)

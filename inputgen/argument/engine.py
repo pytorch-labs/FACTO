@@ -4,7 +4,6 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import random
 from typing import Any, List, Optional, Tuple, Union
 
 import torch
@@ -13,6 +12,7 @@ from inputgen.attribute.engine import AttributeEngine
 from inputgen.attribute.model import Attribute
 from inputgen.attribute.solve import AttributeSolver
 from inputgen.specs.model import Constraint, ConstraintSuffix
+from inputgen.utils.random_manager import random_manager as rm
 from inputgen.variable.type import ScalarDtype
 
 
@@ -60,7 +60,9 @@ class StructuralEngine:
             yield from self.gen_structure_with_depth(depth, focus, length)
             return
 
-        focus_ixs = range(length) if focus == attr else (random.choice(range(length)),)
+        focus_ixs = (
+            range(length) if focus == attr else (rm.get_random().choice(range(length)),)
+        )
         for focus_ix in focus_ixs:
             values = [()]
             for ix in range(length):
@@ -241,7 +243,7 @@ class MetaArgEngine:
         if focus == Attribute.VALUE:
             return [v.space for v in variables]
         else:
-            return [random.choice(variables).space]
+            return [rm.get_random().choice(variables).space]
 
     def gen(self, focus):
         # TODO(mcandales): Enable Tensor List generation
