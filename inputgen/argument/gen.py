@@ -9,6 +9,7 @@ from typing import Optional, Tuple
 
 import torch
 from inputgen.argument.engine import MetaArg
+from inputgen.utils.random_manager import random_manager
 from inputgen.variable.gen import VariableGenerator
 from inputgen.variable.space import VariableSpace
 from torch.testing._internal.common_dtype import floating_types, integral_types
@@ -41,6 +42,8 @@ class TensorGenerator:
         )
 
     def get_random_tensor(self, size, dtype, high=None, low=None):
+        torch_rng = random_manager.get_torch()
+
         if low is None and high is None:
             low = -100
             high = 100
@@ -55,7 +58,9 @@ class TensorGenerator:
             elif not self.space.contains(1):
                 return torch.full(size, False, dtype=dtype)
             else:
-                return torch.randint(low=0, high=2, size=size, dtype=dtype)
+                return torch.randint(
+                    low=0, high=2, size=size, dtype=dtype, generator=torch_rng
+                )
 
         if dtype in integral_types():
             low = math.ceil(low)
@@ -68,16 +73,38 @@ class TensorGenerator:
 
         if dtype == torch.uint8:
             if not self.space.contains(0):
-                return torch.randint(low=max(1, low), high=high, size=size, dtype=dtype)
+                return torch.randint(
+                    low=max(1, low),
+                    high=high,
+                    size=size,
+                    dtype=dtype,
+                    generator=torch_rng,
+                )
             else:
-                return torch.randint(low=max(0, low), high=high, size=size, dtype=dtype)
+                return torch.randint(
+                    low=max(0, low),
+                    high=high,
+                    size=size,
+                    dtype=dtype,
+                    generator=torch_rng,
+                )
 
-        t = torch.randint(low=low, high=high, size=size, dtype=dtype)
+        t = torch.randint(
+            low=low, high=high, size=size, dtype=dtype, generator=torch_rng
+        )
         if not self.space.contains(0):
             if high > 0:
-                pos = torch.randint(low=max(1, low), high=high, size=size, dtype=dtype)
+                pos = torch.randint(
+                    low=max(1, low),
+                    high=high,
+                    size=size,
+                    dtype=dtype,
+                    generator=torch_rng,
+                )
             else:
-                pos = torch.randint(low=low, high=0, size=size, dtype=dtype)
+                pos = torch.randint(
+                    low=low, high=0, size=size, dtype=dtype, generator=torch_rng
+                )
             t = torch.where(t == 0, pos, t)
 
         if dtype in integral_types():

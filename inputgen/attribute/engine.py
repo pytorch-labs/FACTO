@@ -12,7 +12,7 @@ from inputgen.attribute.model import Attribute
 from inputgen.attribute.solve import AttributeSolver
 from inputgen.specs.model import Constraint
 from inputgen.variable.gen import VariableGenerator
-from inputgen.variable.type import ScalarDtype
+from inputgen.variable.type import ScalarDtype, sort_values_of_type
 
 
 class AttributeEngine(AttributeSolver):
@@ -51,4 +51,4 @@ class AttributeEngine(AttributeSolver):
             if len(vals) == 0:
                 vals = VariableGenerator(variable.space).gen(num)
             gen_vals.update(vals)
-        return gen_vals
+        return sort_values_of_type(self.vtype, gen_vals)

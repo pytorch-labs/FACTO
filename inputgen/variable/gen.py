@@ -5,11 +5,12 @@
 # LICENSE file in the root directory of this source tree.
 
 import math
-import random
 from typing import Any, List, Optional, Set, Union
 
+from inputgen.utils.random_manager import random_manager as rm
 from inputgen.variable.constants import BOUND_ON_INF, INT64_MAX, INT64_MIN
 from inputgen.variable.space import Interval, Intervals, VariableSpace
+from inputgen.variable.type import sort_values_of_type
 from inputgen.variable.utils import nextdown, nextup
 
 
@@ -51,7 +52,7 @@ def gen_float_from_interval(r: Interval) -> Optional[float]:
     elif lower > upper:
         return None
     else:
-        return random.uniform(lower, upper)
+        return rm.get_random().uniform(lower, upper)
 
 
 def gen_min_float_from_intervals(rs: Intervals) -> Optional[float]:
@@ -69,7 +70,7 @@ def gen_max_float_from_intervals(rs: Intervals) -> Optional[float]:
 def gen_float_from_intervals(rs: Intervals) -> Optional[float]:
     if rs.empty():
         return None
-    r = random.choice(rs.intervals)
+    r = rm.get_random().choice(rs.intervals)
     return gen_float_from_interval(r)
 
 
@@ -112,7 +113,7 @@ def gen_int_from_interval(r: Interval) -> Optional[int]:
     elif upper is None:
         upper = max(lower, 0) + BOUND_ON_INF
     assert lower is not None and upper is not None
-    return random.randint(lower, upper)
+    return rm.get_random().randint(lower, upper)
 
 
 def gen_min_int_from_intervals(rs: Intervals) -> Optional[int]:
@@ -133,7 +134,7 @@ def gen_int_from_intervals(rs: Intervals) -> Optional[int]:
     intervals_with_ints = [r for r in rs.intervals if r.contains_int()]
     if len(intervals_with_ints) == 0:
         return None
-    r = random.choice(intervals_with_ints)
+    r = rm.get_random().choice(intervals_with_ints)
     return gen_int_from_interval(r)
 
 
@@ -146,6 +147,12 @@ class VariableGenerator:
     def __init__(self, space: VariableSpace):
         self.vtype = space.vtype
         self.space = space
+
+    def _sorted(self, values: Set[Any]) -> List[Any]:
+        return sort_values_of_type(self.vtype, values)
+
+    def _sample(self, values: Set[Any], num: int) -> List[Any]:
+        return rm.get_random().sample(self._sorted(values), num)
 
     def gen_min(self) -> Any:
         """Returns the minimum value of the space."""
@@ -221,7 +228,7 @@ class VariableGenerator:
         edges_not_extreme = self.gen_edges() - self.gen_extremes()
         if num >= len(edges_not_extreme):
             return edges_not_extreme
-        return set(random.sample(list(edges_not_extreme), num))
+        return set(self._sample(edges_not_extreme, num))
 
     def gen_non_edges(self, num: int = 2) -> Set[Any]:
         """Generates non-edge (or interior) values of the space."""
@@ -232,7 +239,7 @@ class VariableGenerator:
         if self.space.discrete.initialized:
             vals = self.space.discrete.values - edge_or_extreme_vals
             if num < len(vals):
-                vals = set(random.sample(list(vals), num))
+                vals = set(self._sample(vals, num))
         else:
             for _ in range(100):
                 v: Optional[Union[int, float]] = None
@@ -269,11 +276,8 @@ class VariableGenerator:
 
         if num >= len(balanced):
             return balanced
-        return set(random.sample(list(balanced), num))
+        return set(self._sample(balanced, num))
 
     def gen(self, num: int = 6) -> List[Any]:
         """Generates a sorted (if applicable), balanced sample of the space."""
-        vals = list(self.gen_balanced(num))
-        if self.vtype in [bool, int, float, str]:
-            return sorted(vals)
-        return vals
+        return sort_values_of_type(self.vtype, self.gen_balanced(num))
