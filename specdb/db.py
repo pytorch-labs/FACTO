@@ -1284,12 +1284,7 @@ SpecDB = [
                     cp.Value.Ge(lambda deps, length, ix: 1),
                 ],
             ),
-            InPosArg(  # transposed
-                ArgType.Bool,
-                name="transposed",
-                # TODO(mcandales): Executorch specific constraint
-                # constraints=[cp.Value.Eq(lambda deps: False)],
-            ),
+            InPosArg(ArgType.Bool, name="transposed"),
             InPosArg(  # output_padding
                 ArgType.LengthList,
                 name="output_padding",
@@ -1320,7 +1315,14 @@ SpecDB = [
             ),
         ],
         outspec=[
-            OutArg(ArgType.Tensor),
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: deps[0].dtype,
+                    ),
+                ],
+            )
         ],
     ),
     Spec(
