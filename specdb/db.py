@@ -3954,6 +3954,45 @@ SpecDB = [
         outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
+        op="topk.default",  # (Tensor self, SymInt k, int dim=-1, bool largest=True, bool sorted=True) -> (Tensor values, Tensor indices)
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[cp.Dtype.Ne(lambda deps: torch.bool)],
+            ),
+            InPosArg(
+                ArgType.Length,
+                name="k",
+                deps=[0, 2],
+                constraints=[
+                    cp.Value.Ge(lambda deps: 0),
+                    cp.Value.Le(lambda deps: fn.safe_size(deps[0], deps[1])),
+                ],
+            ),
+            InPosArg(
+                ArgType.Dim,
+                name="dim",
+                deps=[0],
+                constraints=DimDefault,
+            ),
+            InPosArg(ArgType.Bool, name="largest"),
+            InPosArg(ArgType.Bool, name="sorted"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                name="values",
+                constraints=[cp.Dtype.Eq(lambda deps: deps[0].dtype)],
+            ),
+            OutArg(
+                ArgType.Tensor,
+                name="indices",
+                constraints=[cp.Dtype.Eq(lambda deps: torch.long)],
+            ),
+        ],
+    ),
+    Spec(
         op="transpose_copy.int",  # (Tensor self, int dim0, int dim1) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
