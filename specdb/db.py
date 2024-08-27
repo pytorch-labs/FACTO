@@ -1943,6 +1943,59 @@ SpecDB = [
             OutArg(ArgType.Tensor),
         ],
     ),
+    Spec(  # TODO(mcandales): Calibrate.
+        op="gather.default",  # (Tensor self, int dim, Tensor index, *, bool sparse_grad=False) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Dim,
+                name="dim",
+                deps=[0],
+                constraints=[
+                    cp.Value.In(lambda deps: fn.dim_non_zero_size(deps[0])),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="index",
+                deps=[0, 1],
+                # TODO(mcandales) Handle index.numel() == 0 case
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: torch.long),
+                    cp.Rank.Eq(
+                        lambda deps: deps[0].dim() if deps[0].dim() >= 2 else None
+                    ),
+                    cp.Rank.In(
+                        lambda deps: [0, 1] if deps[0].dim() in [0, 1] else None
+                    ),
+                    cp.Size.Le(
+                        lambda deps, r, d: (
+                            fn.safe_size(deps[0], d)
+                            if d != fn.normalize(deps[1], deps[0].dim())
+                            else None
+                        )
+                    ),
+                    cp.Value.Ge(lambda deps, dtype, struct: 0),
+                    cp.Value.Le(
+                        lambda deps, dtype, struct: (
+                            0
+                            if deps[0].dim() == 0
+                            else max(0, fn.safe_size(deps[0], deps[1]) - 1)
+                        )
+                    ),
+                ],
+            ),
+            InKwArg(ArgType.Bool, name="sparse_grad"),
+        ],
+        outspec=[
+            OutArg(
+                ArgType.Tensor,
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                ],
+            ),
+        ],
+    ),
     Spec(
         op="ge.Scalar",  # (Tensor self, Scalar other) -> Tensor
         inspec=[
