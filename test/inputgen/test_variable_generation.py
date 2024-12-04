@@ -19,7 +19,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(nextup(-math.inf), -1.7976931348623157e308)
         self.assertEqual(nextup(-5e-324), 0.0)
         self.assertEqual(nextup(0.0), 5e-324)
-        self.assertEqual(nextup(0.9999999999999999), 1.0),
+        (self.assertEqual(nextup(0.9999999999999999), 1.0),)
         self.assertEqual(nextup(1.0), 1.0000000000000002)
         self.assertEqual(nextup(1.7976931348623157e308), math.inf)
         self.assertEqual(nextup(math.inf), math.inf)
@@ -27,7 +27,7 @@ class TestUtils(unittest.TestCase):
     def test_nextdown(self):
         self.assertEqual(nextdown(math.inf), 1.7976931348623157e308)
         self.assertEqual(nextdown(1.0000000000000002), 1.0)
-        self.assertEqual(nextdown(1.0), 0.9999999999999999),
+        (self.assertEqual(nextdown(1.0), 0.9999999999999999),)
         self.assertEqual(nextdown(5e-324), 0.0)
         self.assertEqual(nextdown(0.0), -5e-324)
         self.assertEqual(nextdown(-1.7976931348623157e308), -math.inf)
