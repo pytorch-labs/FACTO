@@ -12,13 +12,20 @@ Here is an [overview](inputgen/overview.md) of InputGen
 
 SpecDB is a [database](specdb/db.py#L30) of specifications covering most of the Core ATen Ops. They have been developed using the ATen CPU kernels as a reference.
 
+## Instalation
+```
+git clone https://github.com/pytorch-labs/FACTO.git
+cd FACTO
+python3 setup.py install
+```
+
 ## Example Usage
 
 The code below is a minimal example to test add.Tensor using FACTO.
 ```python
 import torch
-from inputgen.argtuple.gen import ArgumentTupleGenerator
-from specdb.db import SpecDictDB
+from facto.inputgen.argtuple.gen import ArgumentTupleGenerator
+from facto.specdb.db import SpecDictDB
 
 # Retrieve the specification from SpecDB
 spec = SpecDictDB["add.Tensor"]
