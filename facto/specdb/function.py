@@ -7,8 +7,8 @@
 import random
 
 import torch
-from inputgen.variable.type import ScalarDtype
-from inputgen.variable.utils import nextdown, nextup
+from facto.inputgen.variable.type import ScalarDtype
+from facto.inputgen.variable.utils import nextdown, nextup
 
 
 def safe_ix(array, ix, default=0):

@@ -7,8 +7,8 @@
 import math
 from typing import Any, List, Union
 
-from inputgen.variable.space import Discrete, VariableSpace
-from inputgen.variable.type import convert_to_vtype, invalid_vtype, is_integer
+from facto.inputgen.variable.space import Discrete, VariableSpace
+from facto.inputgen.variable.type import convert_to_vtype, invalid_vtype, is_integer
 
 
 class SolvableVariable:

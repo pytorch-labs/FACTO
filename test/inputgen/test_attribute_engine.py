@@ -7,11 +7,11 @@
 import unittest
 
 import torch
-from inputgen.argument.type import ArgType
-from inputgen.attribute.engine import AttributeEngine
-from inputgen.attribute.model import Attribute
-from inputgen.specs.model import ConstraintProducer as cp
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.engine import AttributeEngine
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.specs.model import ConstraintProducer as cp
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class TestAttributeEngine(unittest.TestCase):

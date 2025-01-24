@@ -6,11 +6,11 @@
 
 import unittest
 
-from inputgen.argument.type import ArgType
-from inputgen.attribute.model import Attribute
-from inputgen.attribute.solve import AttributeSolver
-from inputgen.specs.model import ConstraintProducer as cp
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.attribute.solve import AttributeSolver
+from facto.inputgen.specs.model import ConstraintProducer as cp
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class TestAttributeSolver(unittest.TestCase):

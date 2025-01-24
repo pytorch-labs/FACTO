@@ -8,8 +8,8 @@ from enum import Enum
 from typing import List, Optional, Tuple
 
 import torch
-from inputgen.argument.type import ArgType
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class Attribute(str, Enum):

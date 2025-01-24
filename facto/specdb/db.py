@@ -6,19 +6,19 @@
 
 import math
 
-import specdb.dtypes as dt
-import specdb.function as fn
+import facto.specdb.dtypes as dt
+import facto.specdb.function as fn
 import torch
-from inputgen.argument.type import ArgType
-from inputgen.specs.model import (
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.specs.model import (
     ConstraintProducer as cp,
     InKwArg,
     InPosArg,
     OutArg,
     Spec,
 )
-from inputgen.variable.type import ScalarDtype
-from specdb.default import (
+from facto.inputgen.variable.type import ScalarDtype
+from facto.specdb.default import (
     DimDefault,
     DimListDefault,
     IndexDefault,

@@ -6,7 +6,7 @@
 
 import unittest
 
-from inputgen.argument.type import ArgType
+from facto.inputgen.argument.type import ArgType
 
 
 class TestArgType(unittest.TestCase):

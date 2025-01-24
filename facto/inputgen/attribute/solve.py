@@ -6,11 +6,11 @@
 
 from typing import Any, List, Optional
 
-from inputgen.argument.type import ArgType
-from inputgen.attribute.model import Attribute
-from inputgen.specs.model import Constraint, ConstraintSuffix
-from inputgen.variable.solve import SolvableVariable
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.specs.model import Constraint, ConstraintSuffix
+from facto.inputgen.variable.solve import SolvableVariable
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class AttributeSolver:

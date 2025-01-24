@@ -7,12 +7,12 @@
 import copy
 from typing import List, Optional
 
-from inputgen.argument.type import ArgType
-from inputgen.attribute.model import Attribute
-from inputgen.attribute.solve import AttributeSolver
-from inputgen.specs.model import Constraint
-from inputgen.variable.gen import VariableGenerator
-from inputgen.variable.type import ScalarDtype, sort_values_of_type
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.attribute.solve import AttributeSolver
+from facto.inputgen.specs.model import Constraint
+from facto.inputgen.variable.gen import VariableGenerator
+from facto.inputgen.variable.type import ScalarDtype, sort_values_of_type
 
 
 class AttributeEngine(AttributeSolver):

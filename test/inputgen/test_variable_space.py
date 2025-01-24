@@ -6,7 +6,7 @@
 
 import unittest
 
-from inputgen.variable.space import Discrete, Interval, Intervals
+from facto.inputgen.variable.space import Discrete, Interval, Intervals
 
 
 class TestDiscrete(unittest.TestCase):

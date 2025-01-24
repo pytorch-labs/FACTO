@@ -8,10 +8,10 @@ import math
 import unittest
 
 import torch
-from inputgen.variable.gen import VariableGenerator
-from inputgen.variable.solve import SolvableVariable
-from inputgen.variable.type import ScalarDtype, SUPPORTED_TENSOR_DTYPES
-from inputgen.variable.utils import nextdown, nextup
+from facto.inputgen.variable.gen import VariableGenerator
+from facto.inputgen.variable.solve import SolvableVariable
+from facto.inputgen.variable.type import ScalarDtype, SUPPORTED_TENSOR_DTYPES
+from facto.inputgen.variable.utils import nextdown, nextup
 
 
 class TestUtils(unittest.TestCase):

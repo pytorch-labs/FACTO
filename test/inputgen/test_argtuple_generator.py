@@ -7,9 +7,9 @@
 import unittest
 
 import torch
-from inputgen.argtuple.gen import ArgumentTupleGenerator
-from inputgen.argument.type import ArgType
-from inputgen.specs.model import ConstraintProducer as cp, InPosArg, Spec
+from facto.inputgen.argtuple.gen import ArgumentTupleGenerator
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.specs.model import ConstraintProducer as cp, InPosArg, Spec
 
 
 class TestArgumentTupleGenerator(unittest.TestCase):

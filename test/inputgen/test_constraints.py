@@ -6,8 +6,12 @@
 
 import unittest
 
-from inputgen.attribute.model import Attribute
-from inputgen.specs.model import Constraint, ConstraintProducer as cp, ConstraintSuffix
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.specs.model import (
+    Constraint,
+    ConstraintProducer as cp,
+    ConstraintSuffix,
+)
 
 
 class TestConstraint(unittest.TestCase):

@@ -7,10 +7,10 @@
 from collections import OrderedDict
 from typing import Any, Generator, List, Tuple
 
-from inputgen.argtuple.engine import MetaArgTupleEngine
-from inputgen.argument.engine import MetaArg
-from inputgen.argument.gen import ArgumentGenerator
-from inputgen.specs.model import Spec
+from facto.inputgen.argtuple.engine import MetaArgTupleEngine
+from facto.inputgen.argument.engine import MetaArg
+from facto.inputgen.argument.gen import ArgumentGenerator
+from facto.inputgen.specs.model import Spec
 
 
 class ArgumentTupleGenerator:

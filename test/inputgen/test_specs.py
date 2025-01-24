@@ -6,8 +6,8 @@
 
 import unittest
 
-from inputgen.argument.type import ArgType
-from inputgen.specs.model import InKwArg, InPosArg, OutArg, Return
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.specs.model import InKwArg, InPosArg, OutArg, Return
 
 
 class TestArgSpecs(unittest.TestCase):

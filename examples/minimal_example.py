@@ -5,8 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch
-from inputgen.argtuple.gen import ArgumentTupleGenerator
-from specdb.db import SpecDictDB
+from facto.inputgen.argtuple.gen import ArgumentTupleGenerator
+from facto.specdb.db import SpecDictDB
 
 
 def main():
