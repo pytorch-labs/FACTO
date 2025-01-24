@@ -7,8 +7,8 @@
 import math
 from typing import Any, Callable, List, Optional, Union
 
-from inputgen.variable.constants import INT64_MAX, INT64_MIN
-from inputgen.variable.type import (
+from facto.inputgen.variable.constants import INT64_MAX, INT64_MIN
+from facto.inputgen.variable.type import (
     invalid_vtype,
     is_integer,
     ScalarDtype,

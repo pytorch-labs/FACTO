@@ -7,10 +7,10 @@
 import unittest
 
 import torch
-from inputgen.argument.engine import MetaArg
-from inputgen.argument.gen import ArgumentGenerator, TensorGenerator
-from inputgen.argument.type import ArgType
-from inputgen.variable.solve import SolvableVariable
+from facto.inputgen.argument.engine import MetaArg
+from facto.inputgen.argument.gen import ArgumentGenerator, TensorGenerator
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.variable.solve import SolvableVariable
 
 
 class TestTensorGenerator(unittest.TestCase):

@@ -4,10 +4,10 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from inputgen.argument.engine import MetaArgEngine
-from inputgen.argument.gen import ArgumentGenerator
-from inputgen.attribute.model import Attribute
-from inputgen.specs.model import Spec
+from facto.inputgen.argument.engine import MetaArgEngine
+from facto.inputgen.argument.gen import ArgumentGenerator
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.specs.model import Spec
 
 
 def reverse_topological_sort(graph):

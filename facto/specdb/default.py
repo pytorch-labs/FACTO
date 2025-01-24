@@ -4,8 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import specdb.function as fn
-from inputgen.specs.model import ConstraintProducer as cp
+import facto.specdb.function as fn
+from facto.inputgen.specs.model import ConstraintProducer as cp
 
 
 DimDefault = [

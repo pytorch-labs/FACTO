@@ -8,10 +8,10 @@ import math
 from typing import Optional, Tuple
 
 import torch
-from inputgen.argument.engine import MetaArg
-from inputgen.utils.random_manager import random_manager
-from inputgen.variable.gen import VariableGenerator
-from inputgen.variable.space import VariableSpace
+from facto.inputgen.argument.engine import MetaArg
+from facto.inputgen.utils.random_manager import random_manager
+from facto.inputgen.variable.gen import VariableGenerator
+from facto.inputgen.variable.space import VariableSpace
 from torch.testing._internal.common_dtype import floating_types, integral_types
 
 

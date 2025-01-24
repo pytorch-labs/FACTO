@@ -6,9 +6,9 @@
 
 import unittest
 
-from inputgen.argtuple.engine import MetaArgTupleEngine
-from inputgen.argument.type import ArgType
-from inputgen.specs.model import ConstraintProducer as cp, InPosArg, Spec
+from facto.inputgen.argtuple.engine import MetaArgTupleEngine
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.specs.model import ConstraintProducer as cp, InPosArg, Spec
 
 
 class TestMetaArgTupleEngine(unittest.TestCase):

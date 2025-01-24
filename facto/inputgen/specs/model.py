@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, List, Optional
 
-from inputgen.argument.type import ArgType
-from inputgen.attribute.model import Attribute
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.model import Attribute
 
 
 class ConstraintSuffix(str, Enum):

@@ -7,9 +7,9 @@
 import unittest
 
 import torch
-from inputgen.variable.constants import INT64_MAX, INT64_MIN
-from inputgen.variable.solve import SolvableVariable
-from inputgen.variable.type import ScalarDtype, SUPPORTED_TENSOR_DTYPES
+from facto.inputgen.variable.constants import INT64_MAX, INT64_MIN
+from facto.inputgen.variable.solve import SolvableVariable
+from facto.inputgen.variable.type import ScalarDtype, SUPPORTED_TENSOR_DTYPES
 
 
 class TestSolvableVariable(unittest.TestCase):

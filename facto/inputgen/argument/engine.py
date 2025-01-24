@@ -7,13 +7,13 @@
 from typing import Any, List, Optional, Tuple, Union
 
 import torch
-from inputgen.argument.type import ArgType
-from inputgen.attribute.engine import AttributeEngine
-from inputgen.attribute.model import Attribute
-from inputgen.attribute.solve import AttributeSolver
-from inputgen.specs.model import Constraint, ConstraintSuffix
-from inputgen.utils.random_manager import random_manager as rm
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.engine import AttributeEngine
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.attribute.solve import AttributeSolver
+from facto.inputgen.specs.model import Constraint, ConstraintSuffix
+from facto.inputgen.utils.random_manager import random_manager as rm
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class StructuralEngine:

@@ -7,9 +7,9 @@
 import unittest
 
 import torch
-from inputgen.argument.type import ArgType
-from inputgen.attribute.model import Attribute
-from inputgen.variable.type import ScalarDtype
+from facto.inputgen.argument.type import ArgType
+from facto.inputgen.attribute.model import Attribute
+from facto.inputgen.variable.type import ScalarDtype
 
 
 class TestAttribute(unittest.TestCase):

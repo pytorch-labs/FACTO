@@ -7,7 +7,7 @@
 import unittest
 
 import torch
-from inputgen.variable.type import (
+from facto.inputgen.variable.type import (
     convert_to_vtype,
     invalid_vtype,
     is_integer,
