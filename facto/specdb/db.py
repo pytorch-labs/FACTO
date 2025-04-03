@@ -2128,7 +2128,7 @@ SpecDB = [
                         lambda deps, dtype: fn.dtype_strict_lower_bound(deps[0].dtype)
                     ),
                     cp.Value.Lt(
-                        lambda deps, dtype: fn.dtype_strict_lower_bound(deps[0].dtype)
+                        lambda deps, dtype: fn.dtype_strict_upper_bound(deps[0].dtype)
                     ),
                 ],
             ),
