@@ -31,3 +31,6 @@ class RandomManager:
 
 
 random_manager = RandomManager()
+seeded_random_manager = RandomManager()
+# 1792 is a random seed that was used to generate the random inputs for the Facto benchmark results
+seeded_random_manager.seed(1792)
