@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch
-from facto.inputgen.utils.random_manager import random_manager as rm
+from facto.inputgen.utils.random_manager import seeded_random_manager as rm
 from facto.inputgen.variable.type import ScalarDtype
 from facto.inputgen.variable.utils import nextdown, nextup
 

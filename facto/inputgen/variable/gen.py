@@ -7,7 +7,7 @@
 import math
 from typing import Any, List, Optional, Set, Union
 
-from facto.inputgen.utils.random_manager import random_manager as rm
+from facto.inputgen.utils.random_manager import seeded_random_manager as rm
 from facto.inputgen.variable.constants import BOUND_ON_INF, INT64_MAX, INT64_MIN
 from facto.inputgen.variable.space import Interval, Intervals, VariableSpace
 from facto.inputgen.variable.type import sort_values_of_type

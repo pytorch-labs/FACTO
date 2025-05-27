@@ -12,7 +12,7 @@ from facto.inputgen.attribute.engine import AttributeEngine
 from facto.inputgen.attribute.model import Attribute
 from facto.inputgen.attribute.solve import AttributeSolver
 from facto.inputgen.specs.model import Constraint, ConstraintSuffix
-from facto.inputgen.utils.random_manager import random_manager as rm
+from facto.inputgen.utils.random_manager import seeded_random_manager as rm
 from facto.inputgen.variable.type import ScalarDtype
 
 

@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 
 import torch
 from facto.inputgen.argument.engine import MetaArg
-from facto.inputgen.utils.random_manager import random_manager
+from facto.inputgen.utils.random_manager import seeded_random_manager
 from facto.inputgen.variable.gen import VariableGenerator
 from facto.inputgen.variable.space import VariableSpace
 from torch.testing._internal.common_dtype import floating_types, integral_types
@@ -42,7 +42,7 @@ class TensorGenerator:
         )
 
     def get_random_tensor(self, size, dtype, high=None, low=None):
-        torch_rng = random_manager.get_torch()
+        torch_rng = seeded_random_manager.get_torch()
 
         if low is None and high is None:
             low = -100
