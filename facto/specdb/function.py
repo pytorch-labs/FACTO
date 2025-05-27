@@ -4,9 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import random
-
 import torch
+from facto.inputgen.utils.random_manager import random_manager as rm
 from facto.inputgen.variable.type import ScalarDtype
 from facto.inputgen.variable.utils import nextdown, nextup
 
@@ -166,11 +165,11 @@ def factorize(n, length):
         factor_list = []
         prod = 1
         for _ in range(length):
-            x = random.choice(range(10))
+            x = rm.get_random().choice(range(10))
             factor_list.append(x)
             prod *= x
         if prod != 0:
-            i = random.choice(range(length))
+            i = rm.get_random().choice(range(length))
             factor_list[i] = 0
         return {tuple(factor_list)}
 
@@ -180,7 +179,7 @@ def factorize(n, length):
     factors = factorize_into_primes(n)
     factor_list = [1] * length
     for factor in factors:
-        x = random.choice(range(length))
+        x = rm.get_random().choice(range(length))
         factor_list[x] *= factor
     return {tuple(factor_list)}
 
@@ -188,21 +187,21 @@ def factorize(n, length):
 def valid_view_copy_size(tensor, length):
     n = tensor.numel()
     valids = factorize(n, length)
-    factors = random.choice(list(factorize(n, length)))
+    factors = rm.get_random().choice(list(factorize(n, length)))
     if length >= 1:
         if n > 0:
-            x = random.choice(range(length))
+            x = rm.get_random().choice(range(length))
             factor_list = list(factors)
             factor_list[x] = -1
             valids |= {tuple(factor_list)}
         else:
             zeros = [i for i in range(length) if factors[i] == 0]
-            z = random.choice(zeros)
+            z = rm.get_random().choice(zeros)
             factor_list = list(factors)
             factor_list[z] = -1
             for i in range(length):
                 if i != z and factors[i] == 0:
-                    factor_list[i] = random.choice(range(1, 10))
+                    factor_list[i] = rm.get_random().choice(range(1, 10))
             valids |= {tuple(factor_list)}
     return valids
 
@@ -221,39 +220,39 @@ def invalid_view_copy_size(tensor, length):
     if n > 2:
         invalids |= factorize(n - 1, length)
     if n > 3:
-        x = random.choice(range(2, n - 1))
+        x = rm.get_random().choice(range(2, n - 1))
         invalids |= factorize(x, length)
     invalids |= factorize(n + 1, length)
     if n > 0:
         invalids |= factorize(2 * n, length)
         invalids |= factorize(3 * n, length)
-    factors = random.choice(list(factorize(n, length)))
+    factors = rm.get_random().choice(list(factorize(n, length)))
     potential_negative = []
     for ix, factor in enumerate(factors):
         if factor > 1:
             potential_negative.append(ix)
     if len(potential_negative) >= 1:
-        x = random.choice(potential_negative)
+        x = rm.get_random().choice(potential_negative)
         factor_list = list(factors)
         factor_list[x] = -factors[x]
         invalids |= {tuple(factor_list)}
     if len(potential_negative) >= 2:
-        x, y = random.sample(potential_negative, 2)
+        x, y = rm.get_random().sample(potential_negative, 2)
         factor_list = list(factors)
         factor_list[x] = -factors[x]
         factor_list[y] = -factors[y]
         invalids |= {tuple(factor_list)}
     if length >= 2:
-        x, y = random.sample(range(length), 2)
+        x, y = rm.get_random().sample(range(length), 2)
         factor_list = list(factors)
         factor_list[x], factor_list[y] = -1, -1
         invalids |= {tuple(factor_list)}
     if length >= 1 and n == 0:
         zeros = [i for i in range(length) if factors[i] == 0]
-        z = random.choice(zeros)
+        z = rm.get_random().choice(zeros)
         non_z = [i for i in range(length) if i != z]
         if len(non_z) >= 1:
-            x = random.choice([i for i in range(length) if i != z])
+            x = rm.get_random().choice([i for i in range(length) if i != z])
             factor_list = list(factors)
             factor_list[x] = -1
             invalids |= {tuple(factor_list)}
@@ -289,9 +288,9 @@ def valid_dim_list_helper(tensor, pool, length):
 
     n = max(tensor.dim(), 1)
 
-    sample = tuple(random.sample(pool, length))
+    sample = tuple(rm.get_random().sample(pool, length))
     neg_sample = tuple(s - n for s in sample)
-    mix_sample = tuple(random.choice([s, s - n]) for s in sample)
+    mix_sample = tuple(rm.get_random().choice([s, s - n]) for s in sample)
 
     return {sample, neg_sample, mix_sample}
 
