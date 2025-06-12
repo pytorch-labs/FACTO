@@ -2500,6 +2500,69 @@ SpecDB = [
             OutArg(ArgType.Tensor, name="indices"),
         ],
     ),
+    Spec(  # TODO(mcandales): Calibrate.
+        op="max_pool3d_with_indices.default",  # (Tensor self, int[3] kernel_size, int[3] stride=[], int[3] padding=0, int[3] dilation=1, bool ceil_mode=False) -> (Tensor, Tensor)
+        inspec=[
+            InPosArg(  # self
+                ArgType.Tensor,
+                name="self",
+                deps=[1, 2, 3, 4, 5],
+                constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
+                    cp.Rank.In(lambda deps: [4, 5]),
+                    # cp.Size.Ge(lambda deps, r, d: 0 if d == 0 and r == 5 else 1),
+                    cp.Size.Ge(
+                        lambda deps, r, d: fn.pool_input_size_min(
+                            3, deps[0], deps[1], deps[2], deps[3], deps[4], r, d
+                        )
+                    ),
+                ],
+            ),
+            InPosArg(  # kernel_size
+                ArgType.LengthList,
+                name="kernel_size",
+                constraints=[
+                    cp.Length.In(lambda deps: [1, 3]),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(  # stride
+                ArgType.LengthList,
+                name="stride",
+                constraints=[
+                    cp.Length.In(lambda deps: [0, 1, 3]),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(  # padding
+                ArgType.LengthList,
+                name="padding",
+                deps=[1],
+                constraints=[
+                    cp.Length.In(lambda deps: [1, 3]),
+                    cp.Value.Ge(lambda deps, length, ix: 0),
+                    cp.Value.Le(
+                        lambda deps, length, ix: fn.pool_padding_max(
+                            deps[0], length, ix
+                        )
+                    ),
+                ],
+            ),
+            InPosArg(  # dilation
+                ArgType.LengthList,
+                name="dilation",
+                constraints=[
+                    cp.Length.In(lambda deps: [1, 3]),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(ArgType.Bool, name="ceil_mode"),  # ceil_mode
+        ],
+        outspec=[
+            OutArg(ArgType.Tensor, name="out"),
+            OutArg(ArgType.Tensor, name="indices"),
+        ],
+    ),
     Spec(
         op="maximum.default",  # (Tensor self, Tensor other) -> Tensor
         inspec=[

@@ -459,8 +459,8 @@ def pool_input_size_min(
     kernel_ndim, kernel_size, stride, padding, dilation, ceil_mode, rank, dim
 ):
     if dim == 0:
-        return 0 if rank == 4 else 1
-    if dim == 1 and rank == 4:
+        return 0 if rank == (kernel_ndim + 2) else 1
+    if dim == 1 and rank == (kernel_ndim + 2):
         return 1
 
     kdim = dim - (rank - kernel_ndim)
