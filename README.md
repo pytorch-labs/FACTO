@@ -6,11 +6,11 @@ Framework for Algorithmic Correctness Testing of Operators
 
 InputGen is a Python library to generate inputs for torch operators, given certain specifications. These specifications can be provided by the user, or can be retrieved from a library of specifications such as SpecDB. They provide a complete description of the space of valid inputs to the operator.
 
-Here is an [overview](inputgen/overview.md) of InputGen
+Here is an [overview](facto/inputgen/overview.md) of InputGen
 
 ## SpecDB
 
-SpecDB is a [database](specdb/db.py#L30) of specifications covering most of the Core ATen Ops. They have been developed using the ATen CPU kernels as a reference.
+SpecDB is a [database](facto/specdb/db.py#L30) of specifications covering most of the Core ATen Ops. They have been developed using the ATen CPU kernels as a reference.
 
 ## Instalation
 ```
