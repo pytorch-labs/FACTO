@@ -16,7 +16,7 @@ SpecDB is a [database](facto/specdb/db.py#L30) of specifications covering most o
 ```
 git clone https://github.com/pytorch-labs/FACTO.git
 cd FACTO
-python3 setup.py install
+pip install
 ```
 
 ## Example Usage
