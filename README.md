@@ -13,10 +13,10 @@ Here is an [overview](facto/inputgen/overview.md) of InputGen
 SpecDB is a [database](facto/specdb/db.py#L30) of specifications covering most of the Core ATen Ops. They have been developed using the ATen CPU kernels as a reference.
 
 ## Instalation
-```
+```bash
 git clone https://github.com/pytorch-labs/FACTO.git
 cd FACTO
-pip install
+pip install .
 ```
 
 ## Example Usage
