@@ -6,6 +6,11 @@ Framework for Algorithmic Correctness Testing of Operators
 
 InputGen is a Python library to generate inputs for torch operators, given certain specifications. These specifications can be provided by the user, or can be retrieved from a library of specifications such as SpecDB. They provide a complete description of the space of valid inputs to the operator.
 
+InputGen uses the `ArgumentTupleGenerator` class to systematically generate valid input combinations based on operator specifications. It handles:
+- Type constraints (e.g., alpha in add must be a scalar, input must be a tensor)
+- Inter-argument dependencies (e.g., output tensor shape depends on input tensor shapes)
+- Shape and dtype compatibility (e.g., tensors in add operation must be broadcastable)
+
 Here is an [overview](facto/inputgen/overview.md) of InputGen
 
 ## SpecDB
