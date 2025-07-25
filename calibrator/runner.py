@@ -17,6 +17,8 @@ from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.specs.model import Spec
 from facto.specdb.db import SpecDictDB
 from torch._ops import OpOverload
+from torchgen.model import SchemaKind
+
 
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 
@@ -49,7 +51,6 @@ class SpecRunner:
     def get_callable_op(self):
         try:
             from executorch.exir.dialects.edge.op.api import get_callable, to_variant
-            from torchgen.model import SchemaKind
         except ImportError:
             raise RuntimeError("Please install executorch to use the calibrator.")
         
