@@ -74,7 +74,6 @@ class TensorTransformationGenerator:
             and ndim >= 2
             and seeded_random_manager.get_random().random() < self.config.probability
         ):
-
             dims = list(range(ndim))
             seeded_random_manager.get_random().shuffle(dims)
 
@@ -91,7 +90,6 @@ class TensorTransformationGenerator:
             and ndim >= 2
             and seeded_random_manager.get_random().random() < self.config.probability
         ):
-
             dims = list(range(ndim))
             dim1, dim2 = seeded_random_manager.get_random().sample(dims, 2)
 
@@ -103,7 +101,6 @@ class TensorTransformationGenerator:
             and len(self.structure) >= 1
             and seeded_random_manager.get_random().random() < self.config.probability
         ):
-
             tt.slice_steps = self.gen_slice_steps()
 
         return tt

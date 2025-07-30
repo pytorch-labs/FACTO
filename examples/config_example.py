@@ -6,8 +6,8 @@
 
 import torch
 from facto.inputgen.argtuple.gen import ArgumentTupleGenerator
-from facto.specdb.db import SpecDictDB
 from facto.inputgen.utils.config import ConditionConfig
+from facto.specdb.db import SpecDictDB
 
 
 def qualify_tensor(tensor):

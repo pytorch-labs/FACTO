@@ -11,8 +11,8 @@ from typing import Any, Generator, List, Optional, Tuple
 from facto.inputgen.argtuple.engine import MetaArgTupleEngine
 from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.argument.gen import ArgumentGenerator
-from facto.inputgen.specs.model import Spec, ConstraintProducer as cp
-from facto.inputgen.utils.config import ConditionConfig, Condition
+from facto.inputgen.specs.model import ConstraintProducer as cp, Spec
+from facto.inputgen.utils.config import Condition, ConditionConfig
 
 
 class ArgumentTupleGenerator:
