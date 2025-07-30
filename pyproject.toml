@@ -24,4 +24,4 @@ dependencies = [
 Homepage = "https://github.com/pytorch-labs/FACTO"
 
 [tool.setuptools.packages.find]
-include = ["facto", "facto.*"] 
+include = ["facto", "facto.*"]
