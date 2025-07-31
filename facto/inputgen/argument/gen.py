@@ -10,7 +10,7 @@ from typing import Optional, Tuple
 
 import torch
 from facto.inputgen.argument.engine import MetaArg
-from facto.inputgen.utils.config import Condition, ConditionConfig
+from facto.inputgen.utils.config import Condition, TensorConfig
 from facto.inputgen.utils.random_manager import seeded_random_manager
 from facto.inputgen.variable.gen import VariableGenerator
 from facto.inputgen.variable.space import VariableSpace
@@ -35,11 +35,11 @@ class TensorTransformationGenerator:
         self,
         dtype: Optional[torch.dtype],
         structure: Tuple,
-        config: Optional[ConditionConfig] = None,
+        config: Optional[TensorConfig] = None,
     ):
         self.dtype: Optional[torch.dtype] = dtype
         self.structure: Tuple = structure
-        self.config: Optional[ConditionConfig] = config
+        self.config: Optional[TensorConfig] = config
 
     def gen_slice_steps(self):
         slice_steps = []

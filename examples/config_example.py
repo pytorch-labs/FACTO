@@ -6,7 +6,7 @@
 
 import torch
 from facto.inputgen.argtuple.gen import ArgumentTupleGenerator
-from facto.inputgen.utils.config import ConditionConfig
+from facto.inputgen.utils.config import TensorConfig
 from facto.specdb.db import SpecDictDB
 
 
@@ -52,7 +52,7 @@ def pretty_print_add_args(posargs, inkwargs, outargs):
 def generate_inputs():
     spec = SpecDictDB["add.Tensor"]
 
-    config = ConditionConfig(
+    config = TensorConfig(
         empty=False,
         transposed=False,
         permuted=True,

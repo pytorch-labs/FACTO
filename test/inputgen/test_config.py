@@ -12,12 +12,12 @@ from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.argument.gen import ArgumentGenerator
 from facto.inputgen.argument.type import ArgType
 from facto.inputgen.specs.model import ConstraintProducer as cp, InPosArg, Spec
-from facto.inputgen.utils.config import ConditionConfig
+from facto.inputgen.utils.config import TensorConfig
 from facto.inputgen.variable.solve import SolvableVariable
 
 
-class TestConditionConfigIntegration(unittest.TestCase):
-    """Integration tests for ConditionConfig"""
+class TestTensorConfigIntegration(unittest.TestCase):
+    """Integration tests for TensorConfig"""
 
     def setUp(self):
         """Set up common test fixtures."""
@@ -37,7 +37,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
     def test_transposed_tensor_generation(self):
         """Test that ALLOW_TRANSPOSED condition affects tensor generation."""
         # Not allow transposition
-        config = ConditionConfig(transposed=False).set_probability(1.0)
+        config = TensorConfig(transposed=False).set_probability(1.0)
 
         generator = ArgumentGenerator(self.meta_arg, config=config)
         tensor = generator.gen()
@@ -48,7 +48,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         self.assertEqual(tensor.dim_order(), (0, 1))
 
         # Force transposition to be applied
-        config = ConditionConfig(transposed=True).set_probability(1.0)
+        config = TensorConfig(transposed=True).set_probability(1.0)
 
         generator = ArgumentGenerator(self.meta_arg, config=config)
         tensor = generator.gen()
@@ -69,7 +69,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         )
 
         # Not allow permutation
-        config = ConditionConfig(permuted=False)
+        config = TensorConfig(permuted=False)
         generator = ArgumentGenerator(meta_arg_3d, config=config)
         tensor = generator.gen()
 
@@ -79,7 +79,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         self.assertEqual(tensor.dim_order(), (0, 1, 2))
 
         # Force permutation to be applied
-        config = ConditionConfig(permuted=True).set_probability(1.0)
+        config = TensorConfig(permuted=True).set_probability(1.0)
         generator = ArgumentGenerator(meta_arg_3d, config=config)
         tensor = generator.gen()
 
@@ -91,10 +91,10 @@ class TestConditionConfigIntegration(unittest.TestCase):
     def test_strided_tensor_generation(self):
         """Test that ALLOW_STRIDED condition affects tensor generation."""
         # Test with striding allowed and high probability
-        config = ConditionConfig(strided=True).set_probability(1.0)
+        config = TensorConfig(strided=True).set_probability(1.0)
 
         # Not allow strided
-        config = ConditionConfig(strided=False)
+        config = TensorConfig(strided=False)
         generator = ArgumentGenerator(self.meta_arg, config=config)
         tensor = generator.gen()
 
@@ -106,7 +106,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         self.assertTrue(tensor.is_contiguous())
 
         # Force strided tensor to be generated
-        config = ConditionConfig(strided=True).set_probability(1.0)
+        config = TensorConfig(strided=True).set_probability(1.0)
         generator = ArgumentGenerator(self.meta_arg, config=config)
         tensor = generator.gen()
 
@@ -119,7 +119,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
 
     def test_multiple_conditions_enabled(self):
         """Test tensor generation with multiple conditions enabled."""
-        config = ConditionConfig(
+        config = TensorConfig(
             transposed=True, permuted=True, strided=True
         ).set_probability(1.0)
 
@@ -145,7 +145,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
 
     def test_no_conditions_enabled(self):
         """Test tensor generation with no special conditions enabled."""
-        config = ConditionConfig()  # All conditions False by default
+        config = TensorConfig()  # All conditions False by default
 
         meta_arg = MetaArg(
             argtype=ArgType.Tensor,
@@ -186,7 +186,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         )
 
         # Test with ALLOW_EMPTY=False (should prevent empty tensors)
-        config = ConditionConfig(empty=False)
+        config = TensorConfig(empty=False)
         generator = ArgumentTupleGenerator(spec, config=config)
 
         # Generate multiple argument tuples and verify none have empty tensors
@@ -229,7 +229,7 @@ class TestConditionConfigIntegration(unittest.TestCase):
         )
 
         # Test with ALLOW_EMPTY=True (should allow empty tensors)
-        config = ConditionConfig(empty=True)
+        config = TensorConfig(empty=True)
         generator = ArgumentTupleGenerator(spec, config=config)
 
         # Generate multiple argument tuples and check if any have empty tensors

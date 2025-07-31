@@ -14,7 +14,7 @@ class Condition(str, Enum):
     ALLOW_STRIDED = "strided"
 
 
-class ConditionConfig:
+class TensorConfig:
     def __init__(self, **conditions):
         self.conditions = {condition: False for condition in Condition}
         for condition, value in conditions.items():
@@ -25,6 +25,6 @@ class ConditionConfig:
     def is_allowed(self, condition: Condition) -> bool:
         return self.conditions.get(condition, False)
 
-    def set_probability(self, probability: float) -> "ConditionConfig":
+    def set_probability(self, probability: float) -> "TensorConfig":
         self.probability = probability
         return self

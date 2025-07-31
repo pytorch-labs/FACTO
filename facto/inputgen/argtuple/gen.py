@@ -12,19 +12,19 @@ from facto.inputgen.argtuple.engine import MetaArgTupleEngine
 from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.argument.gen import ArgumentGenerator
 from facto.inputgen.specs.model import ConstraintProducer as cp, Spec
-from facto.inputgen.utils.config import Condition, ConditionConfig
+from facto.inputgen.utils.config import Condition, TensorConfig
 
 
 class ArgumentTupleGenerator:
-    def __init__(self, spec: Spec, config: Optional[ConditionConfig] = None):
+    def __init__(self, spec: Spec, config: Optional[TensorConfig] = None):
         self.spec = spec
         self.config = config
         self._modified_spec = self._apply_config_constraints(spec, config)
 
     def _apply_config_constraints(
-        self, spec: Spec, config: Optional[ConditionConfig]
+        self, spec: Spec, config: Optional[TensorConfig]
     ) -> Spec:
-        """Apply ConditionConfig constraints to the spec by modifying argument constraints."""
+        """Apply TensorConfig constraints to the spec by modifying argument constraints."""
 
         if config is None:
             return spec
@@ -42,7 +42,7 @@ class ArgumentTupleGenerator:
 
         return Spec(spec.op, modified_inspec, modified_outspec)
 
-    def _apply_constraints_to_arg(self, arg, config: ConditionConfig):
+    def _apply_constraints_to_arg(self, arg, config: TensorConfig):
         """Apply config constraints to a single argument."""
         # Create a copy of the argument with potentially modified constraints
         modified_arg = deepcopy(arg)
