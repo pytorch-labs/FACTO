@@ -3124,7 +3124,11 @@ SpecDB = [
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -3155,20 +3159,26 @@ SpecDB = [
                     cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [3, 4]),
                     cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 4 else 0),
-
                     # padding[0] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                     # padding[2] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
                     # padding[3] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
                     # self.size(-2) + padding[2] + padding[3] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][2] + deps[0][3]) if d == r - 2 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -3199,27 +3209,36 @@ SpecDB = [
                     cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [4, 5]),
                     cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 5 else 0),
-
                     # padding[0] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                     # padding[2] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
                     # padding[3] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
                     # self.size(-2) + padding[2] + padding[3] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][2] + deps[0][3]) if d == r - 2 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                     # padding[4] < self.size(-3)
                     cp.Size.Gt(lambda deps, r, d: deps[0][4] if d == r - 3 else None),
                     # padding[5] < self.size(-3)
                     cp.Size.Gt(lambda deps, r, d: deps[0][5] if d == r - 3 else None),
                     # self.size(-3) + padding[4] + padding[5] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][4] + deps[0][5]) if d == r - 3 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][4] + deps[0][5]) if d == r - 3 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -3349,7 +3368,11 @@ SpecDB = [
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -3380,20 +3403,26 @@ SpecDB = [
                     cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [3, 4]),
                     cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 4 else 0),
-
                     # padding[0] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                     # padding[2] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
                     # padding[3] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
                     # self.size(-2) + padding[2] + padding[3] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][2] + deps[0][3]) if d == r - 2 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -3424,27 +3453,36 @@ SpecDB = [
                     cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [4, 5]),
                     cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 5 else 0),
-
                     # padding[0] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
                     # padding[1] < self.size(-1)
                     cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
                     # self.size(-1) + padding[0] + padding[1] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][0] + deps[0][1]) if d == r - 1 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                     # padding[2] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
                     # padding[3] < self.size(-2)
                     cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
                     # self.size(-2) + padding[2] + padding[3] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][2] + deps[0][3]) if d == r - 2 else None),
-
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                     # padding[4] < self.size(-3)
                     cp.Size.Gt(lambda deps, r, d: deps[0][4] if d == r - 3 else None),
                     # padding[5] < self.size(-3)
                     cp.Size.Gt(lambda deps, r, d: deps[0][5] if d == r - 3 else None),
                     # self.size(-3) + padding[4] + padding[5] > 0
-                    cp.Size.Gt(lambda deps, r, d: -(deps[0][4] + deps[0][5]) if d == r - 3 else None),
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][4] + deps[0][5]) if d == r - 3 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
