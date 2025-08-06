@@ -27,18 +27,18 @@ class TestSpecDBOperations(unittest.TestCase):
         op_names = list(SpecDictDB.keys())
 
         skip_ops = [
-            '_native_batch_norm_legit_no_training.default',
-            'addmm.default',
-            'arange.default',
-            'arange.start_step',
-            'constant_pad_nd.default',
-            'reflection_pad1d.default',
-            'reflection_pad2d.default',
-            'reflection_pad3d.default',
-            'replication_pad1d.default',
-            'replication_pad2d.default',
-            'replication_pad3d.default',
-            'split_with_sizes_copy.default',
+            "_native_batch_norm_legit_no_training.default",
+            "addmm.default",
+            "arange.default",
+            "arange.start_step",
+            "constant_pad_nd.default",
+            "reflection_pad1d.default",
+            "reflection_pad2d.default",
+            "reflection_pad3d.default",
+            "replication_pad1d.default",
+            "replication_pad2d.default",
+            "replication_pad3d.default",
+            "split_with_sizes_copy.default",
         ]
 
         for op_name in op_names:
@@ -61,9 +61,9 @@ class TestSpecDBOperations(unittest.TestCase):
                     self.fail(f"Failed while testing operation {op_name}: {e}")
 
                 if len(errors) > 0:
-                    self.fail(f"Found {len(errors)} errors for {op_name} with valid=True, out=False")
-
-
+                    self.fail(
+                        f"Found {len(errors)} errors for {op_name} with valid=True, out=False"
+                    )
 
 
 if __name__ == "__main__":

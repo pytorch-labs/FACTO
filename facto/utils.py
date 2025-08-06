@@ -22,11 +22,15 @@ def get_op_overload(op_name: str):
         ValueError: If the operation name format is invalid
     """
     if "." not in op_name:
-        raise ValueError(f"Operation name '{op_name}' must contain a '.' to separate base and overload")
+        raise ValueError(
+            f"Operation name '{op_name}' must contain a '.' to separate base and overload"
+        )
 
     parts = op_name.split(".")
     if len(parts) != 2:
-        raise ValueError(f"Operation name '{op_name}' must be in format 'op_base.overload'")
+        raise ValueError(
+            f"Operation name '{op_name}' must be in format 'op_base.overload'"
+        )
 
     op_base, overload = parts
 
@@ -37,6 +41,8 @@ def get_op_overload(op_name: str):
     op_obj = getattr(torch.ops.aten, op_base)
 
     if not hasattr(op_obj, overload):
-        raise AttributeError(f"Overload '{overload}' not found for operation '{op_base}'")
+        raise AttributeError(
+            f"Overload '{overload}' not found for operation '{op_base}'"
+        )
 
     return getattr(op_obj, overload)
