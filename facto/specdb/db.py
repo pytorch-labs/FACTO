@@ -1120,6 +1120,14 @@ SpecDB = [
                 deps=[0, 1],
                 constraints=[
                     cp.Optional.Eq(lambda deps: False if deps[1] is None else True),
+                    cp.Dtype.Ne(
+                        lambda deps: (
+                            torch.bool
+                            if deps[0].dtype == torch.bool
+                            and (deps[1] is None or deps[1].dtype == torch.bool)
+                            else None
+                        )
+                    ),
                     cp.Size.In(
                         lambda deps, r, d: fn.broadcast_with(
                             (
