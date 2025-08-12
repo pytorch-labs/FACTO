@@ -53,6 +53,20 @@ class ArgumentTupleGenerator:
                 size_constraint = cp.Size.Ge(lambda deps, r, d: 1)
                 modified_arg.constraints = modified_arg.constraints + [size_constraint]
 
+        # Add dtype constraints for tensor arguments when dtypes are disallowed
+        if config.disallow_dtypes:
+            if arg.type.is_tensor():
+                dtype_constraint = cp.Dtype.NotIn(lambda deps: config.disallow_dtypes)
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+            elif arg.type.is_tensor_list():
+                dtype_constraint = cp.Dtype.NotIn(
+                    lambda deps, length, ix: config.disallow_dtypes
+                )
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+            elif arg.type.is_scalar_type():
+                dtype_constraint = cp.Value.NotIn(lambda deps: config.disallow_dtypes)
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+
         return modified_arg
 
     def gen_tuple(
@@ -83,3 +97,61 @@ class ArgumentTupleGenerator:
         engine = MetaArgTupleEngine(self._modified_spec, out=out)
         for meta_tuple in engine.gen(valid=valid):
             yield self.gen_tuple(meta_tuple, out=out)
+
+    def gen_errors(
+        self, op, *, valid: bool = True, out: bool = False, verbose: bool = False
+    ) -> Generator[
+        Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
+    ]:
+        """
+        Generate input tuples and yield only those that don't behave as expected.
+
+        This function takes the same signature as gen() but with an additional
+        op parameter. It filters inputs based on whether they behave as expected:
+        - When valid=True: yields inputs that should be valid but DO error
+        - When valid=False: yields inputs that should be invalid but DON'T error
+
+        Args:
+            op: The operation/function to test the inputs against
+            valid: Whether to generate valid or invalid inputs (same as gen())
+            out: Whether to include output arguments (same as gen())
+
+        Yields:
+            Tuples of (posargs, inkwargs, outargs) that don't behave as expected
+        """
+
+        engine = MetaArgTupleEngine(self._modified_spec, out=out)
+        for meta_tuple in engine.gen(valid=valid):
+            posargs, inkwargs, outargs = self.gen_tuple(meta_tuple, out=out)
+
+            try:
+                # Try to execute the operation with the generated inputs
+                if out:
+                    # If there are output arguments, include them in the call
+                    op(*posargs, **inkwargs, **outargs)
+                else:
+                    # Otherwise, just call with positional and keyword arguments
+                    op(*posargs, **inkwargs)
+
+                # If execution succeeds:
+                if valid:
+                    # When valid=True, we expect success, so this is NOT a bug
+                    continue
+                else:
+                    # When valid=False, we expect failure, so success IS a bug
+                    if verbose:
+                        print(f"Unexpected success:")
+                        print(op.__name__, str([str(x) for x in meta_tuple]))
+                    yield posargs, inkwargs, outargs
+
+            except Exception as e:
+                # If execution fails:
+                if valid:
+                    # When valid=True, we expect success, so failure IS a bug
+                    if verbose:
+                        print(op.__name__, str([str(x) for x in meta_tuple]))
+                        print(f"Exception occurred: {e}")
+                    yield posargs, inkwargs, outargs
+                else:
+                    # When valid=False, we expect failure, so this is NOT a bug
+                    continue
