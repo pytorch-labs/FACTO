@@ -8,6 +8,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Any, Generator, List, Optional, Tuple
 
+import torch
 from facto.inputgen.argtuple.engine import MetaArgTupleEngine
 from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.argument.gen import ArgumentGenerator
@@ -99,7 +100,13 @@ class ArgumentTupleGenerator:
             yield self.gen_tuple(meta_tuple, out=out)
 
     def gen_errors(
-        self, op, *, valid: bool = True, out: bool = False, verbose: bool = False
+        self,
+        op,
+        *,
+        valid: bool = True,
+        out: bool = False,
+        verbose: bool = False,
+        check_correctness: bool = False,
     ) -> Generator[
         Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
     ]:
@@ -128,15 +135,64 @@ class ArgumentTupleGenerator:
                 # Try to execute the operation with the generated inputs
                 if out:
                     # If there are output arguments, include them in the call
-                    op(*posargs, **inkwargs, **outargs)
+                    ret = op(*posargs, **inkwargs, **outargs)
                 else:
                     # Otherwise, just call with positional and keyword arguments
-                    op(*posargs, **inkwargs)
+                    ret = op(*posargs, **inkwargs)
 
                 # If execution succeeds:
                 if valid:
                     # When valid=True, we expect success, so this is NOT a bug
-                    continue
+                    if (
+                        check_correctness
+                        and self.config is not None
+                        and self.config.device != "cpu"
+                    ):
+                        # If correctness=True, and device != cpu we also check if the output is correct
+                        # by comparing it to the cpu output
+                        cpu_posargs = []
+                        cpu_inkwargs = OrderedDict()
+                        cpu_outargs = OrderedDict()
+                        for arg in posargs:
+                            new = arg
+                            if isinstance(arg, torch.Tensor):
+                                new = arg.to("cpu")
+                            cpu_posargs.append(new)
+                        for k, v in inkwargs.items():
+                            new = v
+                            if isinstance(v, torch.Tensor):
+                                new = v.to("cpu")
+                            cpu_inkwargs[k] = new
+                        for k, v in outargs.items():
+                            new = v
+                            if isinstance(v, torch.Tensor):
+                                new = v.to("cpu")
+                            cpu_outargs[k] = new
+
+                        try:
+                            cpu_ret = op(*cpu_posargs, **cpu_inkwargs, **cpu_outargs)
+                        except Exception:
+                            continue
+
+                        if isinstance(ret, torch.Tensor) and isinstance(
+                            cpu_ret, torch.Tensor
+                        ):
+                            if not torch.allclose(
+                                cpu_ret, ret.to("cpu"), equal_nan=True
+                            ):
+                                cpu_ret_f = cpu_ret.to(torch.float)
+                                ret_f = ret.to("cpu").to(torch.float)
+
+                                max_diff = (cpu_ret_f - ret_f).abs().max()
+                                if verbose:
+                                    print(f"Output mismatch: {max_diff}")
+                                    print(
+                                        op.__name__, str([str(x) for x in meta_tuple])
+                                    )
+                                    if ret.numel() < 10:
+                                        print(ret)
+                                        print(cpu_ret)
+                                yield posargs, inkwargs, outargs
                 else:
                     # When valid=False, we expect failure, so success IS a bug
                     if verbose:
