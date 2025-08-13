@@ -6,8 +6,8 @@
 
 import math
 
-import facto.specdb.dtypes as dt
 import facto.specdb.function as fn
+import facto.utils.dtypes as dt
 import torch
 from facto.inputgen.argument.type import ArgType
 from facto.inputgen.specs.model import (

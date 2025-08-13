@@ -22,6 +22,10 @@ class TestSpecDBOperationsCPU(BaseSpecDBTest):
             "split_with_sizes_copy.default",
         ]
 
+        # "cdist" not implemented for 'Half' on CPU
+        # "pdist" not implemented for 'Half' on CPU
+        skip_ops += ["_cdist_forward.default", "_pdist_forward.default"]
+
         self._run_all_ops(skip_ops=skip_ops)
 
 
