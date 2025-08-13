@@ -10,6 +10,7 @@ import torch
 
 
 class Condition(str, Enum):
+    ALLOW_ZERODIM = "zerodim"
     ALLOW_EMPTY = "empty"
     ALLOW_TRANSPOSED = "transposed"
     ALLOW_PERMUTED = "permuted"
@@ -23,6 +24,7 @@ class TensorConfig:
         self.device = device
         self.disallow_dtypes = disallow_dtypes or []
         self.conditions = {condition: False for condition in Condition}
+        self.conditions[Condition.ALLOW_ZERODIM] = True  # allow zerodim by default
         for condition, value in conditions.items():
             if condition in self.conditions:
                 self.conditions[condition] = value

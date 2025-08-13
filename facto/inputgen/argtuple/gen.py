@@ -48,6 +48,15 @@ class ArgumentTupleGenerator:
         # Create a copy of the argument with potentially modified constraints
         modified_arg = deepcopy(arg)
 
+        # Add rank constraints for tensor arguments when zerodim tensors are not allowed
+        if not config.is_allowed(Condition.ALLOW_ZERODIM):
+            if arg.type.is_tensor():
+                rank_constraint = cp.Rank.Ge(lambda deps: 1)
+                modified_arg.constraints = modified_arg.constraints + [rank_constraint]
+            elif arg.type.is_tensor_list():
+                rank_constraint = cp.Rank.Ge(lambda deps, length, ix: 1)
+                modified_arg.constraints = modified_arg.constraints + [rank_constraint]
+
         # Add size constraints for tensor arguments when empty tensors are not allowed
         if not config.is_allowed(Condition.ALLOW_EMPTY):
             if arg.type.is_tensor() or arg.type.is_tensor_list():
@@ -91,12 +100,14 @@ class ArgumentTupleGenerator:
         return posargs, inkwargs, outargs
 
     def gen(
-        self, *, valid: bool = True, out: bool = False
+        self, *, valid: bool = True, out: bool = False, verbose: bool = False
     ) -> Generator[
         Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
     ]:
         engine = MetaArgTupleEngine(self._modified_spec, out=out)
         for meta_tuple in engine.gen(valid=valid):
+            if verbose:
+                print(f"Generated meta_tuple: {[str(x) for x in meta_tuple]}")
             yield self.gen_tuple(meta_tuple, out=out)
 
     def gen_errors(
