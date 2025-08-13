@@ -53,11 +53,16 @@ def generate_inputs():
     spec = SpecDictDB["add.Tensor"]
 
     config = TensorConfig(
+        device="mps",
         empty=False,
         transposed=False,
         permuted=True,
         strided=True,
     ).set_probability(0.7)
+
+    print("Generating inputs with the following config:")
+    print("\tdevice: ", config.device)
+    print("\tconditions: ", config.conditions)
 
     generator = ArgumentTupleGenerator(spec, config=config)
     for ix, tup in enumerate(generator.gen()):
@@ -72,7 +77,8 @@ def test_add_op():
     for posargs, inkwargs, outargs in generate_inputs():
         try:
             op(*posargs, **inkwargs, **outargs)
-        except Exception:
+        except Exception as e:
+            print(f"Failed with error: {e}")
             return False
     return True
 

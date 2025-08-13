@@ -15,7 +15,8 @@ class Condition(str, Enum):
 
 
 class TensorConfig:
-    def __init__(self, **conditions):
+    def __init__(self, device="cpu", **conditions):
+        self.device = device
         self.conditions = {condition: False for condition in Condition}
         for condition, value in conditions.items():
             if condition in self.conditions:
