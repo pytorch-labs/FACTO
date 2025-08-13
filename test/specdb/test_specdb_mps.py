@@ -95,6 +95,12 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         )
         self._run_all_ops(config=config, skip_ops=skip_ops)
 
+    def test_correctness_all_ops_mps(self):
+        config = TensorConfig(
+            device="mps", disallow_dtypes=[torch.float64], half_precision=False
+        )
+        self._run_all_ops(config=config, skip_ops=self.SKIP_OPS, check_correctness=True)
+
 
 if __name__ == "__main__":
     unittest.main()
