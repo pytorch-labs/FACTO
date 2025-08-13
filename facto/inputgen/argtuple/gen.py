@@ -83,3 +83,51 @@ class ArgumentTupleGenerator:
         engine = MetaArgTupleEngine(self._modified_spec, out=out)
         for meta_tuple in engine.gen(valid=valid):
             yield self.gen_tuple(meta_tuple, out=out)
+
+    def gen_errors(
+        self, op, *, valid: bool = True, out: bool = False
+    ) -> Generator[
+        Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
+    ]:
+        """
+        Generate input tuples and yield only those that don't behave as expected.
+
+        This function takes the same signature as gen() but with an additional
+        op parameter. It filters inputs based on whether they behave as expected:
+        - When valid=True: yields inputs that should be valid but DO error
+        - When valid=False: yields inputs that should be invalid but DON'T error
+
+        Args:
+            op: The operation/function to test the inputs against
+            valid: Whether to generate valid or invalid inputs (same as gen())
+            out: Whether to include output arguments (same as gen())
+
+        Yields:
+            Tuples of (posargs, inkwargs, outargs) that don't behave as expected
+        """
+        for posargs, inkwargs, outargs in self.gen(valid=valid, out=out):
+            try:
+                # Try to execute the operation with the generated inputs
+                if out:
+                    # If there are output arguments, include them in the call
+                    op(*posargs, **inkwargs, **outargs)
+                else:
+                    # Otherwise, just call with positional and keyword arguments
+                    op(*posargs, **inkwargs)
+
+                # If execution succeeds:
+                if valid:
+                    # When valid=True, we expect success, so this is NOT a bug
+                    continue
+                else:
+                    # When valid=False, we expect failure, so success IS a bug
+                    yield posargs, inkwargs, outargs
+
+            except Exception:
+                # If execution fails:
+                if valid:
+                    # When valid=True, we expect success, so failure IS a bug
+                    yield posargs, inkwargs, outargs
+                else:
+                    # When valid=False, we expect failure, so this is NOT a bug
+                    continue
