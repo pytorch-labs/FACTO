@@ -12,11 +12,13 @@ class Condition(str, Enum):
     ALLOW_TRANSPOSED = "transposed"
     ALLOW_PERMUTED = "permuted"
     ALLOW_STRIDED = "strided"
+    DISALLOW_DTYPES = "disallow_dtypes"
 
 
 class TensorConfig:
-    def __init__(self, device="cpu", **conditions):
+    def __init__(self, device="cpu", disallow_dtypes=None, **conditions):
         self.device = device
+        self.disallow_dtypes = disallow_dtypes or []
         self.conditions = {condition: False for condition in Condition}
         for condition, value in conditions.items():
             if condition in self.conditions:
@@ -25,6 +27,10 @@ class TensorConfig:
 
     def is_allowed(self, condition: Condition) -> bool:
         return self.conditions.get(condition, False)
+
+    def is_dtype_disallowed(self, dtype) -> bool:
+        """Check if a given dtype is in the disallow list."""
+        return dtype in self.disallow_dtypes
 
     def set_probability(self, probability: float) -> "TensorConfig":
         self.probability = probability
