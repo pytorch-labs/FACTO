@@ -8,13 +8,13 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+import facto.utils.dtypes as dt
 import torch
 from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.utils.config import Condition, TensorConfig
 from facto.inputgen.utils.random_manager import seeded_random_manager
 from facto.inputgen.variable.gen import VariableGenerator
 from facto.inputgen.variable.space import VariableSpace
-from torch.testing._internal.common_dtype import floating_types, integral_types
 
 
 FLOAT_RESOLUTION = 8
@@ -218,10 +218,10 @@ class TensorGenerator:
                     low=0, high=2, size=size, dtype=dtype, generator=torch_rng
                 )
 
-        if dtype in integral_types():
+        if dtype in dt._int:
             low = math.ceil(low)
             high = math.floor(high) + 1
-        elif dtype in floating_types():
+        elif dtype in dt._floating:
             low = math.ceil(FLOAT_RESOLUTION * low)
             high = math.floor(FLOAT_RESOLUTION * high) + 1
         else:
@@ -263,9 +263,9 @@ class TensorGenerator:
                 )
             t = torch.where(t == 0, pos, t)
 
-        if dtype in integral_types():
+        if dtype in dt._int:
             return t
-        if dtype in floating_types():
+        if dtype in dt._floating:
             return t / FLOAT_RESOLUTION
         raise ValueError(f"Unsupported Dtype: {dtype}")
 
