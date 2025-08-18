@@ -1120,6 +1120,14 @@ SpecDB = [
                 deps=[0, 1],
                 constraints=[
                     cp.Optional.Eq(lambda deps: False if deps[1] is None else True),
+                    cp.Dtype.Ne(
+                        lambda deps: (
+                            torch.bool
+                            if deps[0].dtype == torch.bool
+                            and (deps[1] is None or deps[1].dtype == torch.bool)
+                            else None
+                        )
+                    ),
                     cp.Size.In(
                         lambda deps, r, d: fn.broadcast_with(
                             (
@@ -3114,24 +3122,28 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [2, 3]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 3 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 2),
-                    cp.Value.Lt(
-                        lambda deps, length, ix: (
-                            deps[0].size(-ix - 1) if ix < 1 else None
-                        )
-                    ),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
                 ],
             ),
         ],
@@ -3150,25 +3162,38 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [3, 4]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 4 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
+                    # padding[2] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
+                    # padding[3] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
+                    # padding[2] + padding[3] + self.size(-2) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 4),
-                    cp.Value.Lt(
-                        lambda deps, length, ix: (
-                            deps[0].size(-ix - 1) if ix < 2 else None
-                        )
-                    ),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
-                    # self.size(-2) + padding[2] + padding[3] >= 0
                 ],
             ),
         ],
@@ -3187,26 +3212,48 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [4, 5]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 5 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
+                    # padding[2] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
+                    # padding[3] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
+                    # padding[2] + padding[3] + self.size(-2) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
+                    # padding[4] < self.size(-3)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][4] if d == r - 3 else None),
+                    # padding[5] < self.size(-3)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][5] if d == r - 3 else None),
+                    # padding[4] + padding[5] + self.size(-3) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][4] + deps[0][5]) if d == r - 3 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 6),
-                    cp.Value.Lt(
-                        lambda deps, length, ix: (
-                            deps[0].size(-ix - 1) if ix < 3 else None
-                        )
-                    ),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
-                    # self.size(-2) + padding[2] + padding[3] >= 0
-                    # self.size(-3) + padding[4] + padding[5] >= 0
                 ],
             ),
         ],
@@ -3319,19 +3366,28 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [2, 3]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 3 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 2),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
                 ],
             ),
         ],
@@ -3350,20 +3406,38 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [3, 4]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 4 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
+                    # padding[2] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
+                    # padding[3] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
+                    # padding[2] + padding[3] + self.size(-2) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 4),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
-                    # self.size(-2) + padding[2] + padding[3] >= 0
                 ],
             ),
         ],
@@ -3382,21 +3456,48 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="self",
+                deps=[1],
                 constraints=[
+                    cp.Dtype.Ne(lambda deps: torch.bool),
                     cp.Rank.In(lambda deps: [4, 5]),
-                    cp.Size.Gt(lambda deps, r, d: 0 if d > 0 else None),
+                    cp.Size.Gt(lambda deps, r, d: None if d == 0 and r == 5 else 0),
+                    # padding[0] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][0] if d == r - 1 else None),
+                    # padding[1] < self.size(-1)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][1] if d == r - 1 else None),
+                    # padding[0] + padding[1] + self.size(-1) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][0] + deps[0][1]) if d == r - 1 else None
+                        )
+                    ),
+                    # padding[2] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][2] if d == r - 2 else None),
+                    # padding[3] < self.size(-2)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][3] if d == r - 2 else None),
+                    # padding[2] + padding[3] + self.size(-2) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2] + deps[0][3]) if d == r - 2 else None
+                        )
+                    ),
+                    # padding[4] < self.size(-3)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][4] if d == r - 3 else None),
+                    # padding[5] < self.size(-3)
+                    cp.Size.Gt(lambda deps, r, d: deps[0][5] if d == r - 3 else None),
+                    # padding[4] + padding[5] + self.size(-3) > 0
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][4] + deps[0][5]) if d == r - 3 else None
+                        )
+                    ),
                 ],
             ),
             InPosArg(
                 ArgType.LengthList,
                 name="padding",
-                deps=[0],
                 constraints=[
                     cp.Length.Eq(lambda deps: 6),
-                    # TODO(mcandales): Calibrate.
-                    # self.size(-1) + padding[0] + padding[1] >= 0
-                    # self.size(-2) + padding[2] + padding[3] >= 0
-                    # self.size(-3) + padding[4] + padding[5] >= 0
                 ],
             ),
         ],
