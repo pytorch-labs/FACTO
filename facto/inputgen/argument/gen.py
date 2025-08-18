@@ -8,13 +8,13 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+import facto.utils.dtypes as dt
 import torch
 from facto.inputgen.argument.engine import MetaArg
 from facto.inputgen.utils.config import Condition, TensorConfig
 from facto.inputgen.utils.random_manager import seeded_random_manager
 from facto.inputgen.variable.gen import VariableGenerator
 from facto.inputgen.variable.space import VariableSpace
-from torch.testing._internal.common_dtype import floating_types, integral_types
 
 
 FLOAT_RESOLUTION = 8
@@ -112,11 +112,13 @@ class TensorGenerator:
         dtype: Optional[torch.dtype],
         structure: Tuple,
         space: VariableSpace,
+        device: str = "cpu",
         transformation: Optional[TensorTransformation] = None,
     ):
         self.dtype = dtype
         self.structure = structure
         self.space = space
+        self.device = device
         self.transformation = transformation
 
     def gen(self):
@@ -141,6 +143,7 @@ class TensorGenerator:
         tensor = self.get_random_tensor(
             size=underlying_shape, dtype=self.dtype, high=max_val, low=min_val
         )
+        tensor = tensor.to(self.device)
 
         # Apply transformations as instructed
         tensor = self._apply_transformation(tensor)
@@ -192,15 +195,17 @@ class TensorGenerator:
 
         return tensor[indices]
 
-    def get_random_tensor(self, size, dtype, high=None, low=None):
+    def get_random_tensor(self, size, dtype, high=None, low=None) -> torch.Tensor:
         torch_rng = seeded_random_manager.get_torch()
 
         if low is None and high is None:
             low = -100
             high = 100
         elif low is None:
+            assert high is not None
             low = high - 100
         elif high is None:
+            assert low is not None
             high = low + 100
         size = tuple(size)
         if dtype == torch.bool:
@@ -213,10 +218,10 @@ class TensorGenerator:
                     low=0, high=2, size=size, dtype=dtype, generator=torch_rng
                 )
 
-        if dtype in integral_types():
+        if dtype in dt._int:
             low = math.ceil(low)
             high = math.floor(high) + 1
-        elif dtype in floating_types():
+        elif dtype in dt._floating:
             low = math.ceil(FLOAT_RESOLUTION * low)
             high = math.floor(FLOAT_RESOLUTION * high) + 1
         else:
@@ -241,7 +246,7 @@ class TensorGenerator:
                 )
 
         t = torch.randint(
-            low=low, high=high, size=size, dtype=dtype, generator=torch_rng
+            low=low, high=high, size=size, dtype=torch.float, generator=torch_rng
         )
         if not self.space.contains(0):
             if high > 0:
@@ -249,19 +254,20 @@ class TensorGenerator:
                     low=max(1, low),
                     high=high,
                     size=size,
-                    dtype=dtype,
+                    dtype=torch.float,
                     generator=torch_rng,
                 )
             else:
                 pos = torch.randint(
-                    low=low, high=0, size=size, dtype=dtype, generator=torch_rng
+                    low=low, high=0, size=size, dtype=torch.float, generator=torch_rng
                 )
             t = torch.where(t == 0, pos, t)
 
-        if dtype in integral_types():
-            return t
-        if dtype in floating_types():
-            return t / FLOAT_RESOLUTION
+        if dtype in dt._int:
+            return t.to(dtype)
+        if dtype in dt._floating:
+            return (t / FLOAT_RESOLUTION).to(dtype)
+        raise ValueError(f"Unsupported Dtype: {dtype}")
 
 
 class ArgumentGenerator:
@@ -270,6 +276,8 @@ class ArgumentGenerator:
         self.config = config
 
     def gen(self):
+        device = "cpu" if self.config is None else self.config.device
+
         if self.meta.optional:
             return None
         elif self.meta.argtype.is_tensor():
@@ -284,6 +292,7 @@ class ArgumentGenerator:
                 dtype=self.meta.dtype,
                 structure=self.meta.structure,
                 space=self.meta.value,
+                device=device,
                 transformation=transformation,
             ).gen()
         elif self.meta.argtype.is_tensor_list():
@@ -302,6 +311,7 @@ class ArgumentGenerator:
                     dtype=self.meta.dtype[i],
                     structure=self.meta.structure[i],
                     space=self.meta.value,
+                    device=device,
                     transformation=transformation,
                 ).gen()
                 tensors.append(tensor)
