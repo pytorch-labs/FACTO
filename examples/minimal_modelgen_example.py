@@ -4,9 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import torch
-from facto.modelgen.gen import OpModelGenerator
 from facto.inputgen.utils.config import TensorConfig
+from facto.modelgen.gen import OpModelGenerator
 from facto.specdb.db import SpecDictDB
 from facto.utils.ops import get_op_overload
 
