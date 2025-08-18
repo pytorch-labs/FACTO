@@ -6,8 +6,8 @@
 
 import torch
 from facto.modelgen.gen import OpModelGenerator
-from facto.specdb.db import SpecDictDB
 from facto.inputgen.utils.config import TensorConfig
+from facto.specdb.db import SpecDictDB
 from facto.utils.ops import get_op_overload
 
 

@@ -6,9 +6,8 @@
 
 import unittest
 
-from facto.inputgen.utils.config import TensorConfig
-
 from base_model_test import BaseModelTest
+from facto.inputgen.utils.config import TensorConfig
 
 
 class TestSpecDBModelsCPU(BaseModelTest):
