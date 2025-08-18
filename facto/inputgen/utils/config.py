@@ -6,6 +6,8 @@
 
 from enum import Enum
 
+import torch
+
 
 class Condition(str, Enum):
     ALLOW_EMPTY = "empty"
@@ -13,6 +15,7 @@ class Condition(str, Enum):
     ALLOW_PERMUTED = "permuted"
     ALLOW_STRIDED = "strided"
     DISALLOW_DTYPES = "disallow_dtypes"
+    HALF_PRECISION = "half_precision"
 
 
 class TensorConfig:
@@ -23,6 +26,8 @@ class TensorConfig:
         for condition, value in conditions.items():
             if condition in self.conditions:
                 self.conditions[condition] = value
+        if self.conditions[Condition.HALF_PRECISION] is False:
+            self.disallow_dtypes += [torch.float16, torch.bfloat16]
         self.probability = 0.5
 
     def is_allowed(self, condition: Condition) -> bool:
