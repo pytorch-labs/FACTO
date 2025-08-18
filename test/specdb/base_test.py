@@ -16,7 +16,13 @@ from facto.utils.ops import get_op_overload
 class BaseSpecDBTest(unittest.TestCase):
     """Base test class for validating all specs in SpecDB using gen_errors."""
 
-    def _run_op(self, op_name: str, *, config: Optional[TensorConfig] = None):
+    def _run_op(
+        self,
+        op_name: str,
+        *,
+        config: Optional[TensorConfig] = None,
+        check_correctness: bool = False,
+    ):
         """
         Run a single op in SpecDB with a given TensorConfig
 
@@ -37,7 +43,13 @@ class BaseSpecDBTest(unittest.TestCase):
 
             try:
                 errors = list(
-                    generator.gen_errors(op, valid=True, out=False, verbose=True)
+                    generator.gen_errors(
+                        op,
+                        valid=True,
+                        out=False,
+                        verbose=True,
+                        check_correctness=check_correctness,
+                    )
                 )
             except Exception as e:
                 self.fail(f"Failed while testing operation {op_name}: {e}")
@@ -47,7 +59,13 @@ class BaseSpecDBTest(unittest.TestCase):
                     f"Found {len(errors)} errors for {op_name} with valid=True, out=False"
                 )
 
-    def _run_all_ops(self, *, config: Optional[TensorConfig] = None, skip_ops=[]):
+    def _run_all_ops(
+        self,
+        *,
+        config: Optional[TensorConfig] = None,
+        skip_ops=[],
+        check_correctness: bool = False,
+    ):
         """
         Run all ops in SpecDB with a given TensorConfig
 
@@ -61,4 +79,4 @@ class BaseSpecDBTest(unittest.TestCase):
         for op_name in op_names:
             if op_name in skip_ops:
                 continue
-            self._run_op(op_name, config=config)
+            self._run_op(op_name, config=config, check_correctness=check_correctness)
