@@ -35,12 +35,12 @@ SUPPORTED_TENSOR_DTYPES = [
     torch.int64,
     torch.float32,
     torch.float64,
+    torch.float16,
+    torch.bfloat16,
     # The following types are not supported yet, but we should support them soon:
-    # torch.float16,
     # torch.complex32,
     # torch.complex64,
     # torch.complex128,
-    # torch.bfloat16,
 ]
 
 
