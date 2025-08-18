@@ -12,7 +12,11 @@ from facto.inputgen.attribute.model import Attribute
 from facto.inputgen.attribute.solve import AttributeSolver
 from facto.inputgen.specs.model import Constraint
 from facto.inputgen.variable.gen import VariableGenerator
-from facto.inputgen.variable.type import ScalarDtype, sort_values_of_type
+from facto.inputgen.variable.type import (
+    ScalarDtype,
+    sort_values_of_type,
+    SUPPORTED_TENSOR_DTYPES,
+)
 
 
 class AttributeEngine(AttributeSolver):
@@ -33,7 +37,7 @@ class AttributeEngine(AttributeSolver):
             num = 2
         elif self.attribute == focus:
             if self.attribute == Attribute.DTYPE:
-                num = 8
+                num = len(SUPPORTED_TENSOR_DTYPES)
             else:
                 num = 6
         else:
