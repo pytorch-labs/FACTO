@@ -53,6 +53,20 @@ class ArgumentTupleGenerator:
                 size_constraint = cp.Size.Ge(lambda deps, r, d: 1)
                 modified_arg.constraints = modified_arg.constraints + [size_constraint]
 
+        # Add dtype constraints for tensor arguments when dtypes are disallowed
+        if config.disallow_dtypes:
+            if arg.type.is_tensor():
+                dtype_constraint = cp.Dtype.NotIn(lambda deps: config.disallow_dtypes)
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+            elif arg.type.is_tensor_list():
+                dtype_constraint = cp.Dtype.NotIn(
+                    lambda deps, length, ix: config.disallow_dtypes
+                )
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+            elif arg.type.is_scalar_type():
+                dtype_constraint = cp.Value.NotIn(lambda deps: config.disallow_dtypes)
+                modified_arg.constraints = modified_arg.constraints + [dtype_constraint]
+
         return modified_arg
 
     def gen_tuple(
@@ -85,7 +99,7 @@ class ArgumentTupleGenerator:
             yield self.gen_tuple(meta_tuple, out=out)
 
     def gen_errors(
-        self, op, *, valid: bool = True, out: bool = False
+        self, op, *, valid: bool = True, out: bool = False, verbose: bool = False
     ) -> Generator[
         Tuple[List[Any], OrderedDict[str, Any], OrderedDict[str, Any]], Any, Any
     ]:
@@ -105,7 +119,11 @@ class ArgumentTupleGenerator:
         Yields:
             Tuples of (posargs, inkwargs, outargs) that don't behave as expected
         """
-        for posargs, inkwargs, outargs in self.gen(valid=valid, out=out):
+
+        engine = MetaArgTupleEngine(self._modified_spec, out=out)
+        for meta_tuple in engine.gen(valid=valid):
+            posargs, inkwargs, outargs = self.gen_tuple(meta_tuple, out=out)
+
             try:
                 # Try to execute the operation with the generated inputs
                 if out:
@@ -121,12 +139,18 @@ class ArgumentTupleGenerator:
                     continue
                 else:
                     # When valid=False, we expect failure, so success IS a bug
+                    if verbose:
+                        print(f"Unexpected success:")
+                        print(op.__name__, str([str(x) for x in meta_tuple]))
                     yield posargs, inkwargs, outargs
 
-            except Exception:
+            except Exception as e:
                 # If execution fails:
                 if valid:
                     # When valid=True, we expect success, so failure IS a bug
+                    if verbose:
+                        print(op.__name__, str([str(x) for x in meta_tuple]))
+                        print(f"Exception occurred: {e}")
                     yield posargs, inkwargs, outargs
                 else:
                     # When valid=False, we expect failure, so this is NOT a bug
