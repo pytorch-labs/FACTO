@@ -33,12 +33,14 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         # not implemented
         "_pdist_forward.default",
         # impl: clamp tensor number of dims must not be greater than that of input tensor
+        # https://github.com/pytorch/pytorch/issues/160734
         "clamp.Tensor",
         # crash: https://github.com/pytorch/pytorch/issues/154881
         "cumsum.default",
         # sparse_grad not supported in MPS yet
         "gather.default",
         # Dimension specified as -1 but tensor has no dimensions
+        # https://github.com/pytorch/pytorch/issues/160737
         "index_select.default",
         # crash: https://github.com/pytorch/pytorch/issues/154882
         "max_pool2d_with_indices.default",
@@ -46,6 +48,7 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         # https://github.com/pytorch/pytorch/issues/154890
         "topk.default",
         # var_mps: reduction dim must be in the range of input shape
+        # https://github.com/pytorch/pytorch/issues/160738
         "var.correction",
         "var.dim",
     ]
@@ -59,6 +62,7 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
     def test_all_ops_mps_half(self):
         skip_ops = self.SKIP_OPS.copy()
         # ConvTranspose 3D with BF16 or FP16 types is not supported on MPS
+        # https://github.com/pytorch/pytorch/issues/160739
         skip_ops += ["convolution.default"]
 
         config = TensorConfig(
@@ -70,6 +74,7 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         skip_ops = self.SKIP_OPS.copy()
         # argmax.default ['ArgType.Tensor torch.float32 (8, 8)', 'ArgType.DimOpt None', 'ArgType.Bool True']
         # Exception occurred: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contiguous subspaces). Use .reshape(...) instead.
+        # https://github.com/pytorch/pytorch/issues/160740
         skip_ops += ["argmax.default", "argmin.default"]
 
         config = TensorConfig(
