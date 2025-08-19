@@ -246,7 +246,7 @@ class TensorGenerator:
                 )
 
         t = torch.randint(
-            low=low, high=high, size=size, dtype=dtype, generator=torch_rng
+            low=low, high=high, size=size, dtype=torch.float, generator=torch_rng
         )
         if not self.space.contains(0):
             if high > 0:
@@ -254,19 +254,19 @@ class TensorGenerator:
                     low=max(1, low),
                     high=high,
                     size=size,
-                    dtype=dtype,
+                    dtype=torch.float,
                     generator=torch_rng,
                 )
             else:
                 pos = torch.randint(
-                    low=low, high=0, size=size, dtype=dtype, generator=torch_rng
+                    low=low, high=0, size=size, dtype=torch.float, generator=torch_rng
                 )
             t = torch.where(t == 0, pos, t)
 
         if dtype in dt._int:
-            return t
+            return t.to(dtype)
         if dtype in dt._floating:
-            return t / FLOAT_RESOLUTION
+            return (t / FLOAT_RESOLUTION).to(dtype)
         raise ValueError(f"Unsupported Dtype: {dtype}")
 
 
