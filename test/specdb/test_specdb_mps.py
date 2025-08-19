@@ -51,6 +51,9 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
             "var.dim",
         ]
 
+        # ConvTranspose 3D with BF16 or FP16 types is not supported on MPS
+        skip_ops += ["convolution.default"]
+
         config = TensorConfig(device="mps", disallow_dtypes=[torch.float64])
         self._run_all_ops(config=config, skip_ops=skip_ops)
 
