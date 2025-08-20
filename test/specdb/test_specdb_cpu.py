@@ -25,7 +25,8 @@ class TestSpecDBOperationsCPU(BaseSpecDBTest):
         skip_ops += [
             "_cdist_forward.default",
             "_pdist_forward.default",
-            "_upsample_bilinear2d_aa.default"]
+            "_upsample_bilinear2d_aa.default",
+        ]
 
         config = TensorConfig(device="cpu", half_precision=True)
         self._run_all_ops(config=config, skip_ops=skip_ops)
