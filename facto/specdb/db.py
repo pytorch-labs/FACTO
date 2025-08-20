@@ -137,6 +137,7 @@ SpecDB = [
                 ArgType.Tensor,
                 name="input",
                 constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
                     cp.Rank.Ge(lambda deps: 2),
                 ],
             ),
@@ -145,6 +146,18 @@ SpecDB = [
                 name="weight",
                 deps=[0],
                 constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.In(
+                        lambda deps: (
+                            [deps[0].dtype, torch.float]
+                            if deps[0].dtype != torch.float64
+                            else None
+                        )
+                    ),
                     cp.Rank.Eq(lambda deps: 1),
                     cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
                 ],
@@ -152,8 +165,28 @@ SpecDB = [
             InPosArg(
                 ArgType.TensorOpt,
                 name="bias",
-                deps=[0],
+                deps=[0, 1],
                 constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
                     cp.Rank.Eq(lambda deps: 1),
                     cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
                 ],
@@ -161,8 +194,42 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="running_mean",
-                deps=[0],
+                deps=[0, 1, 2],
                 constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[2] is not None and deps[2].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[2] is not None and deps[2].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
                     cp.Rank.Eq(lambda deps: 1),
                     cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
                 ],
@@ -170,10 +237,309 @@ SpecDB = [
             InPosArg(
                 ArgType.Tensor,
                 name="running_var",
-                deps=[0],
+                deps=[0, 1, 2, 3],
                 constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[2] is not None and deps[2].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[2] is not None and deps[2].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[3] is not None and deps[3].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[3] is not None and deps[3].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
                     cp.Rank.Eq(lambda deps: 1),
                     cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(ArgType.Float, name="momentum"),
+            InPosArg(ArgType.Float, name="eps"),
+        ],
+        outspec=[
+            OutArg(ArgType.Tensor, name="out0"),
+            OutArg(ArgType.Tensor, name="out1"),
+            OutArg(ArgType.Tensor, name="out2"),
+        ],
+    ),
+    Spec(
+        op="_native_batch_norm_legit.default",  # (Tensor input, Tensor? weight, Tensor? bias, Tensor running_mean, Tensor running_var, bool training, float momentum, float eps) -> (Tensor, Tensor, Tensor)
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="input",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                    cp.Rank.Ge(lambda deps: 2),
+                ],
+            ),
+            InPosArg(
+                ArgType.TensorOpt,
+                name="weight",
+                deps=[0],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.In(
+                        lambda deps: (
+                            [deps[0].dtype, torch.float]
+                            if deps[0].dtype != torch.float64
+                            else None
+                        )
+                    ),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.TensorOpt,
+                name="bias",
+                deps=[0, 1],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="running_mean",
+                deps=[0, 1, 2],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[2] is not None and deps[2].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[2] is not None and deps[2].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="running_var",
+                deps=[0, 1, 2, 3],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[2] is not None and deps[2].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[2] is not None and deps[2].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[3] is not None and deps[3].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[3] is not None and deps[3].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.Bool,
+                name="training",
+            ),
+            InPosArg(ArgType.Float, name="momentum"),
+            InPosArg(ArgType.Float, name="eps"),
+        ],
+        outspec=[
+            OutArg(ArgType.Tensor, name="out0"),
+            OutArg(ArgType.Tensor, name="out1"),
+            OutArg(ArgType.Tensor, name="out2"),
+        ],
+    ),
+    Spec(
+        op="_native_batch_norm_legit.no_stats",  # (Tensor input, Tensor? weight, Tensor? bias, bool training, float momentum, float eps) -> (Tensor, Tensor, Tensor)
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="input",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                    cp.Rank.Ge(lambda deps: 2),
+                ],
+            ),
+            InPosArg(
+                ArgType.TensorOpt,
+                name="weight",
+                deps=[0],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.In(
+                        lambda deps: (
+                            [deps[0].dtype, torch.float]
+                            if deps[0].dtype != torch.float64
+                            else None
+                        )
+                    ),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.TensorOpt,
+                name="bias",
+                deps=[0, 1],
+                constraints=[
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float64 if deps[0].dtype == torch.float64 else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            deps[0].dtype
+                            if deps[1] is not None and deps[1].dtype == deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.Eq(
+                        lambda deps: (
+                            torch.float
+                            if deps[1] is not None and deps[1].dtype != deps[0].dtype
+                            else None
+                        )
+                    ),
+                    cp.Dtype.In(lambda deps: [deps[0].dtype, torch.float]),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Size.Eq(lambda deps, r, d: fn.safe_size(deps[0], 1)),
+                ],
+            ),
+            InPosArg(
+                ArgType.Bool,
+                name="training",
+                constraints=[
+                    cp.Value.Eq(lambda deps: True),
                 ],
             ),
             InPosArg(ArgType.Float, name="momentum"),
@@ -277,6 +643,49 @@ SpecDB = [
         outspec=[
             OutArg(ArgType.Tensor),
         ],
+    ),
+    Spec(
+        op="_upsample_bilinear2d_aa.default",  # (Tensor self, SymInt[2] output_size, bool align_corners, float? scales_h=None, float? scales_w=None) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                    cp.Rank.Eq(lambda deps: 4),
+                ],
+            ),
+            InPosArg(
+                ArgType.Shape,
+                name="output_size",
+                constraints=[
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(ArgType.Bool, name="align_corners"),
+            InPosArg(
+                ArgType.FloatOpt,
+                name="scale_h",
+                constraints=[
+                    cp.Value.Gt(lambda deps: 1e-2),
+                    cp.Value.Le(
+                        lambda deps: 10.0
+                    ),  # restrict to avoid storage overflow
+                ],
+            ),
+            InPosArg(
+                ArgType.FloatOpt,
+                name="scale_w",
+                constraints=[
+                    cp.Value.Gt(lambda deps: 1e-2),
+                    cp.Value.Le(
+                        lambda deps: 10.0
+                    ),  # restrict to avoid storage overflow
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
         op="abs.default",  # (Tensor self) -> Tensor
@@ -582,6 +991,8 @@ SpecDB = [
                 constraints=[
                     cp.Value.Ge(lambda deps, dtype: 0),
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    # This is a safeguard to avoid storage overflow
+                    cp.Value.Le(lambda deps, dtype: 1e3),
                 ],
             ),
             InKwArg(
@@ -602,24 +1013,44 @@ SpecDB = [
             InPosArg(
                 ArgType.Scalar,
                 name="start",
+                deps=[3],
                 constraints=[
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[0])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[0])),
                 ],
             ),
             InPosArg(
                 ArgType.Scalar,
                 name="end",
+                deps=[3],
                 constraints=[
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[0])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[0])),
                 ],
             ),
             InPosArg(
                 ArgType.Scalar,
                 name="step",
-                deps=[0, 1],
+                deps=[0, 1, 3],
                 constraints=[
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[2])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[2])),
                     cp.Value.Gt(lambda deps, dtype: 0 if deps[0] < deps[1] else None),
                     cp.Value.Lt(lambda deps, dtype: 0 if deps[0] > deps[1] else None),
+                    cp.Value.Ne(lambda deps, dtype: 0),
+                    # The following is a safeguard to avoid storage overflow
+                    cp.Value.Ge(
+                        lambda deps, dtype: (
+                            (deps[1] - deps[0]) / 1000.0 if deps[0] < deps[1] else None
+                        )
+                    ),
+                    cp.Value.Le(
+                        lambda deps, dtype: (
+                            (deps[1] - deps[0]) / 1000.0 if deps[0] > deps[1] else None
+                        )
+                    ),
                 ],
             ),
             InKwArg(
@@ -1119,7 +1550,7 @@ SpecDB = [
                 name="max",
                 deps=[0, 1],
                 constraints=[
-                    cp.Optional.Eq(lambda deps: False if deps[1] is None else True),
+                    cp.Optional.Eq(lambda deps: False if deps[1] is None else None),
                     cp.Dtype.Ne(
                         lambda deps: (
                             torch.bool
@@ -1182,15 +1613,46 @@ SpecDB = [
     Spec(  # TODO(mcandales): Calibrate.
         op="constant_pad_nd.default",  # (Tensor self, SymInt[] pad, Scalar value=0) -> Tensor
         inspec=[
-            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                deps=[1],
+                constraints=[
+                    cp.Rank.Ge(lambda deps: len(deps[0]) / 2),
+                    # size + left padding >= 0
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            -deps[0][2 * (r - d) - 2]
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                    # size + right padding >= 0
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            -deps[0][2 * (r - d) - 1]
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                    # size + left padding + right padding >= 0
+                    # Here, we use Gt instead of Ge to avoid a bug in ATen
+                    # https://github.com/pytorch/pytorch/issues/161014
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2 * (r - d) - 2] + deps[0][2 * (r - d) - 1])
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                ],
+            ),
             InPosArg(
                 ArgType.LengthList,
                 name="pad",
-                deps=[0],
                 constraints=[
-                    cp.Length.In(
-                        lambda deps: [2 * i for i in range(deps[0].dim() + 1)]
-                    ),
+                    # This ensures that the number of elements in pad is even
+                    cp.Length.NotIn(lambda deps: [2 * i + 1 for i in range(500)]),
                 ],
             ),
             InPosArg(
@@ -1665,6 +2127,22 @@ SpecDB = [
                     ),
                 ],
             ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="elu.default",  # (Tensor self, Scalar alpha=1, Scalar scale=1, Scalar input_scale=1) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                ],
+            ),
+            InPosArg(ArgType.Scalar, name="alpha"),
+            InPosArg(ArgType.Scalar, name="scale"),
+            InPosArg(ArgType.Scalar, name="input_scale"),
         ],
         outspec=[OutArg(ArgType.Tensor)],
     ),
@@ -2426,6 +2904,79 @@ SpecDB = [
             OutArg(ArgType.Tensor),
         ],
     ),
+    # TODO(mcandales): InputGen always generates tensor values after generating the entire tuple of
+    # meta arguments. However, for this op, we need to generate the mask values before the source shape
+    Spec(
+        op="masked_scatter.default",  # (Tensor self, Tensor mask, Tensor source) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="mask",
+                deps=[0],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: torch.bool),
+                    cp.Size.In(
+                        lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
+                    ),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="source",
+                deps=[0, 1],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                    # The constraints below are a hack to ensure that the source tensor has enough elements
+                    cp.Rank.Ge(lambda deps: 1),
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            math.prod(
+                                fn.broadcasted_shape(deps[0].shape, deps[1].shape)
+                            )
+                            if d == 0
+                            else None
+                        )
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="masked_select.default",  # (Tensor self, Tensor mask) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="mask",
+                deps=[0],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: torch.bool),
+                    cp.Size.In(
+                        lambda deps, r, d: fn.broadcast_with(deps[0].shape, r, d)
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="max.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
     Spec(
         op="max.dim",  # (Tensor self, int dim, bool keepdim=False) -> (Tensor values, Tensor indices)
         inspec=[
@@ -2627,6 +3178,39 @@ SpecDB = [
         outspec=[
             OutArg(ArgType.Tensor),
         ],
+    ),
+    Spec(
+        op="mean.default",  # (Tensor self, *, ScalarType? dtype=None) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+            ),
+            InKwArg(
+                ArgType.ScalarTypeOpt,
+                name="dtype",
+                deps=[0],
+                constraints=[
+                    cp.Optional.Eq(
+                        lambda deps: (
+                            False if deps[0].dtype not in dt._floating else None
+                        )
+                    ),
+                    cp.Value.In(lambda deps: dt._floating),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="min.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
         op="min.dim",  # (Tensor self, int dim, bool keepdim=False) -> (Tensor values, Tensor indices)
@@ -2875,6 +3459,79 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="native_dropout.default",  # (Tensor input, float p, bool? train) -> (Tensor, Tensor)
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="input",
+                deps=[2],
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating if deps[0] else None),
+                ],
+            ),
+            InPosArg(
+                ArgType.Float,
+                name="p",
+                constraints=[
+                    cp.Value.Ge(lambda deps: 0.0),
+                    cp.Value.Le(lambda deps: 1.0),
+                ],
+            ),
+            InPosArg(
+                ArgType.Bool,
+                name="train",
+            ),
+        ],
+        outspec=[
+            OutArg(ArgType.Tensor, name="output"),
+            OutArg(ArgType.Tensor, name="mask"),
+        ],
+    ),
+    Spec(
+        op="narrow_copy.default",  # (Tensor self, int dim, SymInt start, SymInt length) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.Ge(lambda deps: 1),
+                ],
+            ),
+            InPosArg(
+                ArgType.Dim,
+                name="dim",
+                deps=[0],
+                constraints=DimDefault,
+            ),
+            InPosArg(
+                ArgType.Index,
+                name="start",
+                deps=[0, 1],
+                constraints=[
+                    cp.Value.Ge(lambda deps: -fn.safe_size(deps[0], deps[1])),
+                    cp.Value.Le(lambda deps: fn.safe_size(deps[0], deps[1])),
+                ],
+            ),
+            InPosArg(
+                ArgType.Length,
+                name="length",
+                deps=[0, 1, 2],
+                constraints=[
+                    cp.Value.Ge(lambda deps: 0),
+                    cp.Value.Le(
+                        lambda deps: (
+                            0
+                            if deps[2] == fn.safe_size(deps[0], deps[1])
+                            else fn.safe_size(deps[0], deps[1])
+                            - fn.normalize(deps[2], fn.safe_size(deps[0], deps[1]))
+                        )
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
         op="ne.Scalar",  # (Tensor self, Scalar other) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
@@ -3000,6 +3657,78 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="pixel_unshuffle.default",  # (Tensor self, int downscale_factor) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Rank.Ge(lambda deps: 3),  # At least 3D tensor
+                    cp.Size.Be(
+                        lambda deps, r, d: (
+                            [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                8,
+                                9,
+                                12,
+                                15,
+                                16,
+                                18,
+                                25,
+                            ]
+                            if d == r - 1 or d == r - 2
+                            else None
+                        )
+                    ),
+                ],
+            ),
+            InPosArg(
+                ArgType.Int,
+                name="downscale_factor",
+                deps=[0],
+                constraints=[
+                    cp.Value.Ge(lambda deps: 1),
+                    cp.Value.In(
+                        lambda deps: [
+                            d
+                            for d in range(
+                                1,
+                                max(
+                                    fn.safe_size(deps[0], -1), fn.safe_size(deps[0], -2)
+                                )
+                                + 1,
+                            )
+                            if fn.safe_size(deps[0], -1) % d == 0
+                            and fn.safe_size(deps[0], -2) % d == 0
+                        ]
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="pow.Scalar",  # (Scalar self, Tensor exponent) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Scalar,
+                name="self",
+                constraints=[
+                    cp.Dtype.Ne(lambda deps: ScalarDtype.bool),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="exponent",
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
         op="pow.Tensor_Scalar",  # (Tensor self, Scalar exponent) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
@@ -3108,6 +3837,42 @@ SpecDB = [
                 ],
             ),
         ],
+    ),
+    Spec(
+        op="rand.default",  # (SymInt[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Shape,
+                name="size",
+                constraints=ShapeDefault,
+            ),
+            InKwArg(
+                ArgType.ScalarTypeOpt,
+                name="dtype",
+                constraints=[
+                    cp.Value.In(lambda deps: dt._floating),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="randn.default",  # (SymInt[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Shape,
+                name="size",
+                constraints=ShapeDefault,
+            ),
+            InKwArg(
+                ArgType.ScalarTypeOpt,
+                name="dtype",
+                constraints=[
+                    cp.Value.In(lambda deps: dt._floating),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
         op="reciprocal.default",  # (Tensor self) -> Tensor
@@ -3359,6 +4124,35 @@ SpecDB = [
         outspec=[
             OutArg(ArgType.Tensor),
         ],
+    ),
+    # TODO(mcandales): InputGen always generates tensor values after generating the entire tuple of
+    # meta arguments. However, for this op, we need to generate the tensor values before the output_size
+    Spec(
+        op="repeat_interleave.Tensor",  # (Tensor repeats, *, SymInt? output_size=None) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="repeats",
+                constraints=[
+                    cp.Dtype.In(lambda deps: [torch.int, torch.long]),
+                    cp.Rank.Eq(lambda deps: 1),
+                    cp.Value.Ge(lambda deps, dtype, struct: 0),
+                    cp.Value.Eq(lambda deps, dtype, struct: 3),
+                    # This is a hack to make sure output_size == repeats.sum()
+                ],
+            ),
+            InKwArg(
+                ArgType.IntOpt,
+                name="output_size",
+                deps=[0],
+                constraints=[
+                    # cp.Value.Eq(lambda deps: deps[0].sum().item()),
+                    cp.Value.Eq(lambda deps: 3 * fn.safe_size(deps[0], 0)),
+                    # This is a hack to make sure output_size == repeats.sum()
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
         op="replication_pad1d.default",  # (Tensor self, SymInt[2] padding) -> Tensor
@@ -3642,6 +4436,64 @@ SpecDB = [
         ],
         outspec=[OutArg(ArgType.Tensor)],
     ),
+    Spec(
+        op="scatter.src",  # (Tensor self, int dim, Tensor index, Tensor src) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Dim,
+                name="dim",
+                deps=[0],
+                constraints=DimDefault,
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="index",
+                deps=[0, 1],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: torch.long),
+                    cp.Rank.Eq(
+                        lambda deps: deps[0].dim() if deps[0].dim() >= 2 else None
+                    ),
+                    cp.Rank.In(
+                        lambda deps: [0, 1] if deps[0].dim() in [0, 1] else None
+                    ),
+                    cp.Size.Le(
+                        lambda deps, r, d: (
+                            fn.safe_size(deps[0], d)
+                            if d != fn.normalize(deps[1], deps[0].dim())
+                            else None
+                        )
+                    ),
+                    cp.Value.Ge(lambda deps, dtype, struct: 0),
+                    cp.Value.Le(
+                        lambda deps, dtype, struct: (
+                            0
+                            if deps[0].dim() == 0
+                            else max(0, fn.safe_size(deps[0], deps[1]) - 1)
+                        )
+                    ),
+                ],
+            ),
+            InPosArg(
+                ArgType.Tensor,
+                name="src",
+                deps=[0, 2],
+                constraints=[
+                    cp.Dtype.Eq(lambda deps: deps[0].dtype),
+                    cp.Rank.Eq(
+                        lambda deps: deps[1].dim() if deps[1].numel() != 0 else None
+                    ),
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            fn.safe_size(deps[1], d) if deps[1].numel() != 0 else None
+                        )
+                    ),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
     Spec(  # TODO(mcandales): Calibrate.
         op="scatter.value",  # (Tensor self, int dim, Tensor index, Scalar value) -> Tensor
         inspec=[
@@ -3733,7 +4585,13 @@ SpecDB = [
                 # TODO(mcandales) Handle index.numel() == 0 case
                 constraints=[
                     cp.Dtype.Eq(lambda deps: torch.long),
-                    cp.Rank.Eq(lambda deps: deps[0].dim()),
+                    cp.Rank.Eq(
+                        lambda deps: deps[0].dim() if deps[0].dim() >= 2 else None
+                    ),
+                    cp.Rank.In(
+                        lambda deps: [0, 1] if deps[0].dim() in [0, 1] else None
+                    ),
+                    # cp.Rank.Eq(lambda deps: deps[0].dim()),
                     # cp.Size.Le(lambda deps, r, d: fn.scatter_add_index_size_max(
                     #     deps[0], deps[1], deps[2], d
                     # )),
@@ -4068,8 +4926,19 @@ SpecDB = [
                 name="split_sizes",
                 deps=[0, 2],
                 constraints=[
-                    cp.Value.Ge(lambda deps, length: 0),
-                    cp.Value.Le(lambda deps, length: fn.safe_size(deps[0], deps[1])),
+                    # cp.Value.Ge(lambda deps, length, ix: 0),
+                    # cp.Value.Le(lambda deps, length, ix: fn.safe_size(deps[0], deps[1])),
+                    cp.Length.Ge(lambda deps: 1),
+                    cp.Value.Gen(
+                        lambda deps, length: (
+                            fn.valid_split_sizes(
+                                fn.safe_size(deps[0], deps[1]), length
+                            ),
+                            fn.invalid_split_sizes(
+                                fn.safe_size(deps[0], deps[1]), length
+                            ),
+                        )
+                    ),
                 ],
             ),
             InPosArg(
@@ -4374,6 +5243,35 @@ SpecDB = [
         ],
     ),
     Spec(
+        op="unfold_copy.default",  # (Tensor self, int dimension, int size, int step) -> Tensor
+        inspec=[
+            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Dim,
+                name="dimension",
+                deps=[0],
+                constraints=DimDefault,
+            ),
+            InPosArg(
+                ArgType.Length,
+                name="size",
+                deps=[0, 1],
+                constraints=[
+                    cp.Value.Ge(lambda deps: 0),
+                    cp.Value.Le(lambda deps: fn.safe_size(deps[0], deps[1])),
+                ],
+            ),
+            InPosArg(
+                ArgType.Length,
+                name="step",
+                constraints=[
+                    cp.Value.Ge(lambda deps: 1),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
         op="unsqueeze_copy.default",  # (Tensor self, int dim) -> Tensor
         inspec=[
             InPosArg(ArgType.Tensor, name="self"),
@@ -4390,6 +5288,83 @@ SpecDB = [
         outspec=[
             OutArg(ArgType.Tensor),
         ],
+    ),
+    Spec(
+        op="upsample_bilinear2d.vec",  # (Tensor input, SymInt[]? output_size, bool align_corners, float[]? scale_factors) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="input",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                    cp.Rank.Eq(lambda deps: 4),
+                ],
+            ),
+            InPosArg(
+                ArgType.ShapeOpt,
+                name="output_size",
+                constraints=[
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(ArgType.Bool, name="align_corners"),
+            InPosArg(
+                ArgType.FloatListOpt,
+                name="scale_factors",
+                deps=[0, 1],
+                constraints=[
+                    cp.Optional.Eq(lambda deps: deps[1] is not None),
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Ge(
+                        lambda deps, length, ix: 1
+                        / float(fn.safe_size(deps[0], 2 + ix))
+                    ),
+                    cp.Value.Le(
+                        lambda deps, length, ix: 10.0
+                    ),  # restrict to avoid storage overflow
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
+    ),
+    Spec(
+        op="upsample_nearest2d.vec",  # (Tensor input, SymInt[]? output_size, float[]? scale_factors) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="input",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._floating),
+                    cp.Rank.Eq(lambda deps: 4),
+                ],
+            ),
+            InPosArg(
+                ArgType.ShapeOpt,
+                name="output_size",
+                constraints=[
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Ge(lambda deps, length, ix: 1),
+                ],
+            ),
+            InPosArg(
+                ArgType.FloatListOpt,
+                name="scale_factors",
+                deps=[0, 1],
+                constraints=[
+                    cp.Optional.Eq(lambda deps: deps[1] is not None),
+                    cp.Length.Eq(lambda deps: 2),
+                    cp.Value.Ge(
+                        lambda deps, length, ix: 1
+                        / float(fn.safe_size(deps[0], 2 + ix))
+                    ),
+                    cp.Value.Le(
+                        lambda deps, length, ix: 10.0
+                    ),  # restrict to avoid storage overflow
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(
         op="var.correction",  # (Tensor self, int[1]? dim=None, *, Scalar? correction=None, bool keepdim=False) -> Tensor
@@ -4446,6 +5421,19 @@ SpecDB = [
                 ],
             ),
         ],
+    ),
+    Spec(
+        op="view_as_real_copy.default",  # (Tensor self) -> Tensor
+        inspec=[
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                constraints=[
+                    cp.Dtype.In(lambda deps: dt._complex),
+                ],
+            ),
+        ],
+        outspec=[OutArg(ArgType.Tensor)],
     ),
     Spec(  # TODO(mcandales) Implement numel constraint prefix
         op="view_copy.default",  # (Tensor self, SymInt[] size) -> Tensor
