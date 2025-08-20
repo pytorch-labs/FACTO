@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import traceback
 import unittest
 from typing import Optional
 
@@ -114,6 +115,7 @@ class BaseExecuTorchTest(unittest.TestCase):
                 op = get_op_overload(op_name)
                 generator = OpModelGenerator(op, spec, config)
             except Exception as e:
+                traceback.print_exc()
                 self.fail(
                     f"Failed to create model generator for operation {op_name}: {e}"
                 )
@@ -144,6 +146,7 @@ class BaseExecuTorchTest(unittest.TestCase):
                             model, example_inputs
                         )
                     except Exception as e:
+                        traceback.print_exc()
                         self.fail(
                             f"ExecuTorch export failed for {op_name} (model {model_count}): {e}"
                         )
@@ -154,6 +157,7 @@ class BaseExecuTorchTest(unittest.TestCase):
                             executorch_buffer
                         )
                     except Exception as e:
+                        traceback.print_exc()
                         self.fail(
                             f"ExecuTorch loading failed for {op_name} (model {model_count}): {e}"
                         )
@@ -162,6 +166,7 @@ class BaseExecuTorchTest(unittest.TestCase):
                         # Run with ExecuTorch
                         executorch_outputs = executorch_module.forward(list(args))
                     except Exception as e:
+                        traceback.print_exc()
                         self.fail(
                             f"ExecuTorch execution failed for {op_name} (model {model_count}): {e}"
                         )
@@ -217,6 +222,7 @@ class BaseExecuTorchTest(unittest.TestCase):
                     self.fail(f"No models generated for {op_name}")
 
             except Exception as e:
+                traceback.print_exc()
                 self.fail(
                     f"Failed while testing ExecuTorch models for operation {op_name}: {e}"
                 )
@@ -262,47 +268,33 @@ class TestExecuTorchPortable(BaseExecuTorchTest):
     """Test class for validating ExecuTorch portable kernels end-to-end."""
 
     SKIP_OPS = [
-        # Calibrate specs
-        "_native_batch_norm_legit_no_training.default",
-        "addmm.default",
-        "arange.default",
-        "arange.start_step",
-        "constant_pad_nd.default",
-        "split_with_sizes_copy.default",
-        # Review errors
-        "_cdist_forward.default",
-        "_to_copy.default",
-        "add.Tensor",
-        "add.Scalar",
-        "any.dims",
+        "_cdist_forward.default",  # torch.export failed for _cdist_forward.default (model 14): possible modes: None, 1, 2, but was: 0
+        "_to_copy.default",  # [copy_ops_util.cpp:771] Check failed (non_blocking == false)
+        "add.Tensor",  # failure: https://github.com/pytorch/executorch/issues/13488
+        "add.Scalar",  # torch.export failed for add.Scalar (model 1): too many positional arguments
+        "any.dims",  # failure: https://github.com/pytorch/executorch/issues/13489
         "as_strided_copy.default",
-        "clamp.default",
-        "clamp.Tensor",
-        "convolution.default",
-        "copy.default",
-        "expand_copy.default",
-        "fill.Tensor",
-        "hardtanh.default",
-        "max_pool3d_with_indices.default",
-        "native_group_norm.default",
-        "native_layer_norm.default",
-        "nonzero.default",
-        "rsub.Scalar",
-        "sigmoid.default",
-        "sub.Tensor",
-        "sub.Scalar",
-        "var.correction",
-        "where.self",
-        # Generated meta_tuple: ['ArgType.Tensor torch.float64 (8, 5, 7)', 'ArgType.Dim 2', 'ArgType.Bool False']
-        # [program.cpp:135] InternalConsistency verification requested but not available
-        # [op_log_softmax.cpp:157] In function opt_log_softmax_out(), assert failed (false): Unhandled out dtype 7
-        # zsh: abort
-        "_log_softmax.default",
-        # Generated meta_tuple: ['ArgType.Tensor torch.bool (1, 7, 4)', 'ArgType.Dim 2']
-        # [program.cpp:135] InternalConsistency verification requested but not available
-        # [op_unbind_copy.cpp:79] In function operator()(), assert failed (false): Unhandled dtype Bool for unbind_copy.int_out
-        # zsh: abort
-        "unbind_copy.int",
+        "clamp.default",  # [op_clamp.cpp:120] Check failed (check_bounds(ctx, max_opt.value(), max_type, out_type, "maximum")):
+        "convolution.default",  # feature: https://github.com/pytorch/executorch/issues/13490
+        "copy.default",  # [op_copy.cpp:33] Check failed (non_blocking == false):
+        "expand_copy.default",  # torch.export failed for expand_copy.default (model 1): expand() got an unexpected keyword argument 'implicit'
+        "fill.Tensor",  # No models generated for fill.Tensor (zerodim=False config)
+        "hardtanh.default",  # failure: https://github.com/pytorch/executorch/issues/13491
+        "hardtanh.default",  # torch.export failed for hardtanh.default (model 1): min_val cannot be greater than max_val
+        "max_pool3d_with_indices.default",  # missing kernel
+        "nonzero.default",  # to_executorch failed for nonzero.default (model 1): Could not guard on data-dependent expression Eq(u5, 0) (unhinted: Eq(u5, 0)).  (Size-like symbols: u5)
+        "repeat_interleave.Tensor",  # to_executorch failed for repeat_interleave.Tensor (model 1): Cannot evaluate the shape upper bound of a dynamic-shaped tensor to a concrete bounded integer.
+        "sigmoid.default",  # https://github.com/pytorch/executorch/issues/13492
+        "sub.Scalar",  # torch.export failed for sub.Scalar (model 1): too many positional arguments
+        "var.correction",  # torch.export failed for var.correction (model 2): correction argument should be non-negative
+        "view_as_real_copy.default",  # No models generated for view_as_real_copy.default (enable complex dtype in FACTO)
+        "where.self",  # torch.export failed for where.self (model 2): expected predicate to be bool, got torch.uint8
+        "_log_softmax.default",  # crash: https://github.com/pytorch/executorch/issues/13551
+        "unbind_copy.int",  # crash: https://github.com/pytorch/executorch/issues/13552
+        "_upsample_bilinear2d_aa.default",  # crash: https://github.com/pytorch/executorch/issues/13553
+        "constant_pad_nd.default",  # crash: https://github.com/pytorch/executorch/issues/13554
+        "elu.default",  # crash: https://github.com/pytorch/executorch/issues/13555
+        "narrow_copy.default",  # crash: https://github.com/pytorch/executorch/issues/13556
     ]
 
     @unittest.skipUnless(EXECUTORCH_AVAILABLE, "ExecuTorch not available")
