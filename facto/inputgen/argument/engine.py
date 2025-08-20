@@ -227,6 +227,12 @@ class MetaArgEngine:
         )
         return True in engine.gen(Attribute.OPTIONAL, self.deps)
 
+    def gen_only_null(self):
+        engine = AttributeEngine(
+            Attribute.OPTIONAL, self.constraints, self.valid, self.argtype
+        )
+        return engine.gen(Attribute.OPTIONAL, self.deps) == [True]
+
     def gen_scalars(self, scalar_dtype, focus):
         engine = AttributeEngine(
             Attribute.VALUE, self.constraints, self.valid, self.argtype, scalar_dtype
@@ -262,6 +268,10 @@ class MetaArgEngine:
                 raise NotImplementedError("Tensor List output not implemented yet")
             else:
                 raise ValueError("Output argtype must be tensor or tensor list")
+
+        if self.gen_only_null():
+            yield MetaArg(self.argtype, optional=True)
+            return
 
         if focus in [None, Attribute.OPTIONAL]:
             if self.argtype.is_optional() and self.gen_optional():
