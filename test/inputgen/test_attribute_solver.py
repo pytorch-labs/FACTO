@@ -78,6 +78,21 @@ class TestAttributeSolver(unittest.TestCase):
         variables = list(solver.solve(constraints, Attribute.VALUE, False))
         self.assertEqual(len(variables), 0)
 
+    def test_optional(self):
+        solver = AttributeSolver(Attribute.OPTIONAL, ArgType.IntOpt)
+        constraints = [cp.Optional.Eq(lambda: True)]
+
+        variables = list(solver.solve(constraints, Attribute.OPTIONAL, True))
+        self.assertEqual(len(variables), 1)
+        self.assertEqual(str(variables[0].space), "{True}")
+
+        solver = AttributeSolver(Attribute.OPTIONAL, ArgType.IntOpt)
+        constraints = [cp.Optional.Eq(lambda: False)]
+
+        variables = list(solver.solve(constraints, Attribute.OPTIONAL, True))
+        self.assertEqual(len(variables), 1)
+        self.assertEqual(str(variables[0].space), "{False}")
+
 
 if __name__ == "__main__":
     unittest.main()
