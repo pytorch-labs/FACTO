@@ -13,14 +13,7 @@ from facto.inputgen.utils.config import TensorConfig
 class TestSpecDBOperationsCPU(BaseSpecDBTest):
     """Test class for validating all specs in SpecDB using gen_errors on CPU."""
 
-    SKIP_OPS = [
-        "_native_batch_norm_legit_no_training.default",
-        "addmm.default",
-        "arange.default",
-        "arange.start_step",
-        "constant_pad_nd.default",
-        "split_with_sizes_copy.default",
-    ]
+    SKIP_OPS = []
 
     def test_all_ops_cpu(self):
         config = TensorConfig(device="cpu", half_precision=False)
@@ -28,9 +21,12 @@ class TestSpecDBOperationsCPU(BaseSpecDBTest):
 
     def test_all_ops_cpu_half(self):
         skip_ops = self.SKIP_OPS.copy()
-        # "cdist" not implemented for 'Half' on CPU
-        # "pdist" not implemented for 'Half' on CPU
-        skip_ops += ["_cdist_forward.default", "_pdist_forward.default"]
+        # not implemented for 'Half'
+        skip_ops += [
+            "_cdist_forward.default",
+            "_pdist_forward.default",
+            "_upsample_bilinear2d_aa.default",
+        ]
 
         config = TensorConfig(device="cpu", half_precision=True)
         self._run_all_ops(config=config, skip_ops=skip_ops)
