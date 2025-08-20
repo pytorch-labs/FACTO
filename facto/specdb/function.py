@@ -563,9 +563,8 @@ def invalid_split_sizes(size, length):
     invalid_results = []
     for result in results:
         invalid_result = list(result)
-        invalid_result[
-            0
-        ] += 1  # Modify the first element to ensure the sum is not equal to size
+        # Modify the first element to ensure the sum is not equal to size
+        invalid_result[0] += 1
         invalid_results.append(tuple(invalid_result))
     return invalid_results
 
