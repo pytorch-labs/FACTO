@@ -268,27 +268,27 @@ class TestExecuTorchPortable(BaseExecuTorchTest):
     """Test class for validating ExecuTorch portable kernels end-to-end."""
 
     SKIP_OPS = [
-        "_cdist_forward.default",  # torch.export failed for _cdist_forward.default (model 14): possible modes: None, 1, 2, but was: 0
+        "_cdist_forward.default",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161089
         "_to_copy.default",  # [copy_ops_util.cpp:771] Check failed (non_blocking == false)
         "add.Tensor",  # failure: https://github.com/pytorch/executorch/issues/13488
-        "add.Scalar",  # torch.export failed for add.Scalar (model 1): too many positional arguments
+        "add.Scalar",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161076
         "any.dims",  # failure: https://github.com/pytorch/executorch/issues/13489
         "as_strided_copy.default",
         "clamp.default",  # [op_clamp.cpp:120] Check failed (check_bounds(ctx, max_opt.value(), max_type, out_type, "maximum")):
         "convolution.default",  # feature: https://github.com/pytorch/executorch/issues/13490
         "copy.default",  # [op_copy.cpp:33] Check failed (non_blocking == false):
-        "expand_copy.default",  # torch.export failed for expand_copy.default (model 1): expand() got an unexpected keyword argument 'implicit'
+        "expand_copy.default",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161080
         "fill.Tensor",  # No models generated for fill.Tensor (zerodim=False config)
         "hardtanh.default",  # failure: https://github.com/pytorch/executorch/issues/13491
-        "hardtanh.default",  # torch.export failed for hardtanh.default (model 1): min_val cannot be greater than max_val
+        "hardtanh.default",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161081
         "max_pool3d_with_indices.default",  # missing kernel
         "nonzero.default",  # to_executorch failed for nonzero.default (model 1): Could not guard on data-dependent expression Eq(u5, 0) (unhinted: Eq(u5, 0)).  (Size-like symbols: u5)
         "repeat_interleave.Tensor",  # to_executorch failed for repeat_interleave.Tensor (model 1): Cannot evaluate the shape upper bound of a dynamic-shaped tensor to a concrete bounded integer.
         "sigmoid.default",  # https://github.com/pytorch/executorch/issues/13492
-        "sub.Scalar",  # torch.export failed for sub.Scalar (model 1): too many positional arguments
-        "var.correction",  # torch.export failed for var.correction (model 2): correction argument should be non-negative
+        "sub.Scalar",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161076
+        "var.correction",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161083
         "view_as_real_copy.default",  # No models generated for view_as_real_copy.default (enable complex dtype in FACTO)
-        "where.self",  # torch.export failed for where.self (model 2): expected predicate to be bool, got torch.uint8
+        "where.self",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161088
         "_log_softmax.default",  # crash: https://github.com/pytorch/executorch/issues/13551
         "unbind_copy.int",  # crash: https://github.com/pytorch/executorch/issues/13552
         "_upsample_bilinear2d_aa.default",  # crash: https://github.com/pytorch/executorch/issues/13553
