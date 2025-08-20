@@ -26,17 +26,21 @@ class ArgType(str, Enum):
     DimListOpt = "Dim[]?"
 
     Shape = "Shape"
+    ShapeOpt = "Shape?"
     Index = "Index"
     IndexOpt = "Index?"
     Length = "Length"
     LengthOpt = "Length?"
     LengthList = "Length[]"
+    LengthListOpt = "Length[]?"
 
     Bool = "Bool"
     Int = "Integer"
     IntOpt = "Integer?"
     Float = "Float"
     FloatOpt = "Float?"
+    FloatList = "Float[]"
+    FloatListOpt = "Float[]?"
     String = "String"
     StringOpt = "String?"
     MemoryFormat = "MemoryFormat"
@@ -60,7 +64,7 @@ class ArgType(str, Enum):
         return self in [ArgType.DimList, ArgType.DimListOpt]
 
     def is_shape(self) -> bool:
-        return self in [ArgType.Shape]
+        return self in [ArgType.Shape, ArgType.ShapeOpt]
 
     def is_index(self) -> bool:
         return self in [ArgType.Index, ArgType.IndexOpt]
@@ -69,7 +73,7 @@ class ArgType(str, Enum):
         return self in [ArgType.Length, ArgType.LengthOpt]
 
     def is_length_list(self) -> bool:
-        return self in [ArgType.LengthList]
+        return self in [ArgType.LengthList, ArgType.LengthListOpt]
 
     def is_bool(self) -> bool:
         return self in [ArgType.Bool]
@@ -91,12 +95,16 @@ class ArgType(str, Enum):
             ArgType.TensorOpt,
             ArgType.ScalarOpt,
             ArgType.ScalarTypeOpt,
+            ArgType.ShapeOpt,
             ArgType.DimOpt,
             ArgType.DimListOpt,
             ArgType.FloatOpt,
+            ArgType.FloatListOpt,
             ArgType.IndexOpt,
             ArgType.IntOpt,
             ArgType.LengthOpt,
+            ArgType.LengthListOpt,
+            ArgType.StringOpt,
         ]
 
     def is_list(self) -> bool:
@@ -106,7 +114,11 @@ class ArgType(str, Enum):
             ArgType.DimList,
             ArgType.DimListOpt,
             ArgType.LengthList,
+            ArgType.LengthListOpt,
             ArgType.Shape,
+            ArgType.ShapeOpt,
+            ArgType.FloatList,
+            ArgType.FloatListOpt,
         ]
 
     def has_integer_value(self) -> bool:
@@ -116,11 +128,13 @@ class ArgType(str, Enum):
             ArgType.DimList,
             ArgType.DimListOpt,
             ArgType.Shape,
+            ArgType.ShapeOpt,
             ArgType.Index,
             ArgType.IndexOpt,
             ArgType.Length,
             ArgType.LengthOpt,
             ArgType.LengthList,
+            ArgType.LengthListOpt,
             ArgType.Int,
             ArgType.IntOpt,
         ]
