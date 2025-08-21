@@ -65,6 +65,21 @@ class TestMetaArgEngine(unittest.TestCase):
         self.assertTrue(1 <= len(ms[0].value) <= 5)
         self.assertTrue(all(v == 3 for v in ms[0].value))
 
+    def test_optional_int(self):
+        constraints = [cp.Optional.Eq(lambda deps: True)]
+        deps = []
+        outarg = False
+
+        engine = MetaArgEngine(outarg, ArgType.IntOpt, constraints, deps, True)
+        ms = list(engine.gen(Attribute.OPTIONAL))  # focus is OPTIONAL
+        self.assertEqual(len(ms), 1)
+        self.assertEqual(str(ms[0]), "ArgType.IntOpt None")
+
+        engine = MetaArgEngine(outarg, ArgType.IntOpt, constraints, deps, True)
+        ms = list(engine.gen(Attribute.VALUE))  # focus is VALUE
+        self.assertEqual(len(ms), 1)
+        self.assertEqual(str(ms[0]), "ArgType.IntOpt None")
+
 
 if __name__ == "__main__":
     unittest.main()
