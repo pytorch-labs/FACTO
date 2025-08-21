@@ -57,6 +57,31 @@ class TestAttributeEngine(unittest.TestCase):
         values = engine.gen(Attribute.VALUE)
         self.assertTrue(len(values) == 0)
 
+    def test_optional(self):
+        engine = AttributeEngine(
+            Attribute.OPTIONAL, [cp.Optional.Eq(lambda: True)], True, ArgType.IntOpt
+        )
+        values = engine.gen(Attribute.OPTIONAL)  # focus is OPTIONAL
+        self.assertEqual(values, [True])
+
+        engine = AttributeEngine(
+            Attribute.OPTIONAL, [cp.Optional.Eq(lambda: False)], True, ArgType.IntOpt
+        )
+        values = engine.gen(Attribute.OPTIONAL)  # focus is OPTIONAL
+        self.assertEqual(values, [False])
+
+        engine = AttributeEngine(
+            Attribute.OPTIONAL, [cp.Optional.Eq(lambda: True)], True, ArgType.IntOpt
+        )
+        values = engine.gen(Attribute.VALUE)  # focus is VALUE
+        self.assertEqual(values, [True])
+
+        engine = AttributeEngine(
+            Attribute.OPTIONAL, [cp.Optional.Eq(lambda: False)], True, ArgType.IntOpt
+        )
+        values = engine.gen(Attribute.VALUE)  # focus is VALUE
+        self.assertEqual(values, [False])
+
 
 if __name__ == "__main__":
     unittest.main()
