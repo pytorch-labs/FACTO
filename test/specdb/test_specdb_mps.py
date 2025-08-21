@@ -16,12 +16,6 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
     """Test class for validating all specs in SpecDB using gen_errors on MPS."""
 
     SKIP_OPS = [
-        # Calibrate specs (cpu not passing either):
-        "addmm.default",
-        "arange.default",
-        "arange.start_step",
-        "constant_pad_nd.default",
-        "split_with_sizes_copy.default",
         # https://github.com/pytorch/pytorch/issues/160208
         "add.Tensor",
         "add.Scalar",
@@ -30,11 +24,16 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         "sub.Scalar",
         # crash: https://github.com/pytorch/pytorch/issues/154887
         "_native_batch_norm_legit_no_training.default",
+        "_native_batch_norm_legit.default",
+        "_native_batch_norm_legit.no_stats",
         # not implemented
         "_pdist_forward.default",
         # impl: clamp tensor number of dims must not be greater than that of input tensor
         # https://github.com/pytorch/pytorch/issues/160734
         "clamp.Tensor",
+        # invalid padding argument of size 0
+        # https://github.com/pytorch/pytorch/issues/161066
+        "constant_pad_nd.default",
         # crash: https://github.com/pytorch/pytorch/issues/154881
         "cumsum.default",
         # sparse_grad not supported in MPS yet
@@ -44,6 +43,8 @@ class TestSpecDBOperationsMPS(BaseSpecDBTest):
         "index_select.default",
         # crash: https://github.com/pytorch/pytorch/issues/154882
         "max_pool2d_with_indices.default",
+        # not implemented
+        "native_dropout.default",
         # On-going issue on MPSGraph topk when ndims() - axis > 4, see issue #154890
         # https://github.com/pytorch/pytorch/issues/154890
         "topk.default",
