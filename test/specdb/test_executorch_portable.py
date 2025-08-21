@@ -329,7 +329,8 @@ class TestExecuTorchPortable(BaseExecuTorchTest):
             # Mixed dtype (input float16/bfloat16, float32 params) not supported
             # https://github.com/pytorch/executorch/issues/13586
             "_native_batch_norm_legit_no_training.default",
-            "_native_batch_norm_legit.default" "_native_batch_norm_legit.no_stats",
+            "_native_batch_norm_legit.default",
+            "_native_batch_norm_legit.no_stats",
         ]
 
         config = TensorConfig(device="cpu", zerodim=False, half_precision=True)
