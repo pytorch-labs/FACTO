@@ -991,6 +991,8 @@ SpecDB = [
                 constraints=[
                     cp.Value.Ge(lambda deps, dtype: 0),
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    # This is a safeguard to avoid storage overflow
+                    cp.Value.Le(lambda deps, dtype: 1e3),
                 ],
             ),
             InKwArg(
@@ -1011,24 +1013,44 @@ SpecDB = [
             InPosArg(
                 ArgType.Scalar,
                 name="start",
+                deps=[3],
                 constraints=[
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[0])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[0])),
                 ],
             ),
             InPosArg(
                 ArgType.Scalar,
                 name="end",
+                deps=[3],
                 constraints=[
                     cp.Value.NotIn(lambda deps, dtype: [float("-inf"), float("inf")]),
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[0])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[0])),
                 ],
             ),
             InPosArg(
                 ArgType.Scalar,
                 name="step",
-                deps=[0, 1],
+                deps=[0, 1, 3],
                 constraints=[
+                    cp.Value.Ge(lambda deps, dtype: fn.arange_lower_bound(deps[2])),
+                    cp.Value.Le(lambda deps, dtype: fn.arange_upper_bound(deps[2])),
                     cp.Value.Gt(lambda deps, dtype: 0 if deps[0] < deps[1] else None),
                     cp.Value.Lt(lambda deps, dtype: 0 if deps[0] > deps[1] else None),
+                    cp.Value.Ne(lambda deps, dtype: 0),
+                    # The following is a safeguard to avoid storage overflow
+                    cp.Value.Ge(
+                        lambda deps, dtype: (
+                            (deps[1] - deps[0]) / 1000.0 if deps[0] < deps[1] else None
+                        )
+                    ),
+                    cp.Value.Le(
+                        lambda deps, dtype: (
+                            (deps[1] - deps[0]) / 1000.0 if deps[0] > deps[1] else None
+                        )
+                    ),
                 ],
             ),
             InKwArg(
@@ -1591,15 +1613,46 @@ SpecDB = [
     Spec(  # TODO(mcandales): Calibrate.
         op="constant_pad_nd.default",  # (Tensor self, SymInt[] pad, Scalar value=0) -> Tensor
         inspec=[
-            InPosArg(ArgType.Tensor, name="self"),
+            InPosArg(
+                ArgType.Tensor,
+                name="self",
+                deps=[1],
+                constraints=[
+                    cp.Rank.Ge(lambda deps: len(deps[0]) / 2),
+                    # size + left padding >= 0
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            -deps[0][2 * (r - d) - 2]
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                    # size + right padding >= 0
+                    cp.Size.Ge(
+                        lambda deps, r, d: (
+                            -deps[0][2 * (r - d) - 1]
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                    # size + left padding + right padding >= 0
+                    # Here, we use Gt instead of Ge to avoid a bug in ATen
+                    # https://github.com/pytorch/pytorch/issues/161014
+                    cp.Size.Gt(
+                        lambda deps, r, d: (
+                            -(deps[0][2 * (r - d) - 2] + deps[0][2 * (r - d) - 1])
+                            if (r - d) <= len(deps[0]) / 2
+                            else None
+                        )
+                    ),
+                ],
+            ),
             InPosArg(
                 ArgType.LengthList,
                 name="pad",
-                deps=[0],
                 constraints=[
-                    cp.Length.In(
-                        lambda deps: [2 * i for i in range(deps[0].dim() + 1)]
-                    ),
+                    # This ensures that the number of elements in pad is even
+                    cp.Length.NotIn(lambda deps: [2 * i + 1 for i in range(500)]),
                 ],
             ),
             InPosArg(
@@ -4873,8 +4926,19 @@ SpecDB = [
                 name="split_sizes",
                 deps=[0, 2],
                 constraints=[
-                    cp.Value.Ge(lambda deps, length: 0),
-                    cp.Value.Le(lambda deps, length: fn.safe_size(deps[0], deps[1])),
+                    # cp.Value.Ge(lambda deps, length, ix: 0),
+                    # cp.Value.Le(lambda deps, length, ix: fn.safe_size(deps[0], deps[1])),
+                    cp.Length.Ge(lambda deps: 1),
+                    cp.Value.Gen(
+                        lambda deps, length: (
+                            fn.valid_split_sizes(
+                                fn.safe_size(deps[0], deps[1]), length
+                            ),
+                            fn.invalid_split_sizes(
+                                fn.safe_size(deps[0], deps[1]), length
+                            ),
+                        )
+                    ),
                 ],
             ),
             InPosArg(

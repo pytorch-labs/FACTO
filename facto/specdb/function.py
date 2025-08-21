@@ -534,3 +534,52 @@ def broadcasted_shape(shape_a, shape_b):
             assert a_size == b_size
         res[-ix] = a_size if a_size != 1 else b_size
     return res
+
+
+def valid_split_sizes(size, length):
+    if size <= 0:
+        return [0] * length
+    result = []
+    remaining = size
+    while remaining > 0 and len(result) < length:
+        if len(result) == length - 1:
+            result.append(remaining)
+            break
+        part = rm.get_random().choice(range(0, remaining + 1))
+        result.append(part)
+        remaining -= part
+    while len(result) < length:
+        result.append(0)
+    return [tuple(result)]
+
+
+def invalid_split_sizes(size, length):
+    if length == 0:
+        if size <= 0:
+            return None
+        else:
+            return []
+    results = valid_split_sizes(size, length)
+    invalid_results = []
+    for result in results:
+        invalid_result = list(result)
+        # Modify the first element to ensure the sum is not equal to size
+        invalid_result[0] += 1
+        invalid_results.append(tuple(invalid_result))
+    return invalid_results
+
+
+def arange_lower_bound(dtype):
+    if dtype in [None, torch.uint8, torch.int8, torch.int16, torch.int32, torch.int64]:
+        return torch.iinfo(torch.int64).min / 3
+    if dtype in [torch.float16, torch.bfloat16, torch.float32, torch.float64]:
+        return torch.finfo(dtype).min / 3
+    return None
+
+
+def arange_upper_bound(dtype):
+    if dtype in [None, torch.uint8, torch.int8, torch.int16, torch.int32, torch.int64]:
+        return torch.iinfo(torch.int64).max / 3
+    if dtype in [torch.float16, torch.bfloat16, torch.float32, torch.float64]:
+        return torch.finfo(dtype).max / 3
+    return None
