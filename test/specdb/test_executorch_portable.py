@@ -273,14 +273,18 @@ class TestExecuTorchPortable(BaseExecuTorchTest):
         "add.Tensor",  # failure: https://github.com/pytorch/executorch/issues/13488
         "add.Scalar",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161076
         "any.dims",  # failure: https://github.com/pytorch/executorch/issues/13489
+        "arange.default",  # failure: https://github.com/pytorch/executorch/issues/13580
+        "arange.start_step",  # failure: https://github.com/pytorch/executorch/issues/13581
         "as_strided_copy.default",
         "clamp.default",  # [op_clamp.cpp:120] Check failed (check_bounds(ctx, max_opt.value(), max_type, out_type, "maximum")):
         "convolution.default",  # feature: https://github.com/pytorch/executorch/issues/13490
         "copy.default",  # [op_copy.cpp:33] Check failed (non_blocking == false):
+        "div.Tensor",  # failure: https://github.com/pytorch/executorch/issues/13488
         "expand_copy.default",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161080
         "fill.Tensor",  # No models generated for fill.Tensor (zerodim=False config)
         "hardtanh.default",  # failure: https://github.com/pytorch/executorch/issues/13491
         "hardtanh.default",  # torch.export failed: https://github.com/pytorch/pytorch/issues/161081
+        "masked_select.default",  # failure: https://github.com/pytorch/executorch/issues/13585
         "max_pool3d_with_indices.default",  # missing kernel
         "nonzero.default",  # to_executorch failed for nonzero.default (model 1): Could not guard on data-dependent expression Eq(u5, 0) (unhinted: Eq(u5, 0)).  (Size-like symbols: u5)
         "repeat_interleave.Tensor",  # to_executorch failed for repeat_interleave.Tensor (model 1): Cannot evaluate the shape upper bound of a dynamic-shaped tensor to a concrete bounded integer.
@@ -304,48 +308,29 @@ class TestExecuTorchPortable(BaseExecuTorchTest):
         self._run_all_executorch_models(config=config, skip_ops=self.SKIP_OPS)
 
     @unittest.skipUnless(EXECUTORCH_AVAILABLE, "ExecuTorch not available")
-    def test_executorch_export_cpu_half(self):
+    def test_executorch_cpu_half(self):
         """Test ExecuTorch export and execution on CPU with half precision."""
         skip_ops = self.SKIP_OPS.copy()
-        # Some ATen operations do not support half precision
-        skip_ops += ["_cdist_forward.default", "_pdist_forward.default"]
 
         skip_ops += [
-            # Generated meta_tuple: ['ArgType.Tensor torch.bfloat16 (4, 8, 6)', 'ArgType.Tensor torch.bfloat16 (4, 6, 4)']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_bmm.cpp:163] In function operator()(), assert failed (false): Unhandled dtype BFloat16 for bmm.out
-            # zsh: abort
+            # These ATen operations do not support half precision
+            "_cdist_forward.default",
+            "_pdist_forward.default",
+            # Unhandled Half/BFloat16 in ExecuTorch kernels
+            # https://github.com/pytorch/executorch/issues/13587
             "bmm.default",
-            # Generated meta_tuple: ['ArgType.Tensor torch.bfloat16 (7, 1, 2, 8, 4, 4)', 'ArgType.Scalar -7']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_div.cpp:209] In function operator()(), assert failed (false): Unhandled dtype BFloat16 for div.Scalar_out
-            # zsh: abort
             "div.Scalar",
-            # Generated meta_tuple: ['ArgType.Tensor torch.int16 (2, 7, 8, 1, 4, 8)', 'ArgType.Tensor torch.float16 (1,)']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_div.cpp:169] In function operator()(), assert failed (false): Unhandled dtype Half for div.out
-            # zsh: abort
             "div.Tensor",
-            # Generated meta_tuple: ['ArgType.Tensor torch.float16 (5, 6, 8)', 'ArgType.Scalar -3']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_le.cpp:137] In function operator()(), assert failed (false): Unhandled dtype Half for le.Scalar_out
-            # zsh: abort
             "le.Scalar",
-            # Generated meta_tuple: ['ArgType.Tensor torch.float16 (8, 8, 8, 1, 8, 7)', 'ArgType.Dim 0', 'ArgType.Bool False']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_max.cpp:106] In function operator()(), assert failed (false): Unhandled dtype Half for max.dim_max
-            # zsh: abort
             "max.dim",
-            # Generated meta_tuple: ['ArgType.Tensor torch.float16 (4, 6, 8, 8, 1, 7)', 'ArgType.Dim 3', 'ArgType.Bool True']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_min.cpp:106] In function operator()(), assert failed (false): Unhandled dtype Half for min.dim_min
-            # zsh: abort
             "min.dim",
-            # Generated meta_tuple: ['ArgType.Tensor torch.float16 (3,)', 'ArgType.Dim -1', 'ArgType.Tensor torch.int64 (7,)', 'ArgType.Tensor torch.float16 (8,)']
-            # [program.cpp:135] InternalConsistency verification requested but not available
-            # [op_scatter_add.cpp:107] In function operator()(), assert failed (false): Unhandled dtype Half for scatter_add.out
-            # zsh: abort
             "scatter_add.default",
+            "native_group_norm.default",
+            # Mixed dtype (input float16/bfloat16, float32 params) not supported
+            # https://github.com/pytorch/executorch/issues/13586
+            "_native_batch_norm_legit_no_training.default",
+            "_native_batch_norm_legit.default",
+            "_native_batch_norm_legit.no_stats",
         ]
 
         config = TensorConfig(device="cpu", zerodim=False, half_precision=True)
