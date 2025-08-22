@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pytorch-labs/FACTO"
+Homepage = "https://github.com/meta-pytorch/FACTO"
 
 [tool.setuptools.packages.find]
 include = ["facto", "facto.*"]
