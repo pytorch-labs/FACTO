@@ -19,7 +19,7 @@ SpecDB is a [database](facto/specdb/db.py#L30) of specifications covering most o
 
 ## Instalation
 ```bash
-git clone https://github.com/pytorch-labs/FACTO.git
+git clone https://github.com/meta-pytorch/FACTO.git
 cd FACTO
 pip install .
 ```
@@ -53,7 +53,7 @@ Calibrator is under development. It is intended to be a tool for calibrating the
 ## Reporting problems
 
 If you encounter a bug or some other problem with FACTO, please file an issue on
-https://github.com/pytorch-labs/facto/issues.
+https://github.com/meta-pytorch/facto/issues.
 
 ## License
 
